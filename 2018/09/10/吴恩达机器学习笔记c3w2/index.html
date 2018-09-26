@@ -146,7 +146,7 @@
 </ul>
 <h4 id="train-sets-和-dev-test-sets-不匹配问题的通用的解决方案"><a href="#train-sets-和-dev-test-sets-不匹配问题的通用的解决方案" class="headerlink" title="train sets 和 dev/test sets 不匹配问题的通用的解决方案"></a>train sets 和 dev/test sets 不匹配问题的通用的解决方案</h4><p>一个模型可能的误差类型：</p>
 <ul>
-<li><p><strong>人类误差</strong> (训练集分布)  $&lt;\xlongequal{反映了不同分布的识别难度大小}&gt; $ 人类误差 (开发集分布) </p>
+<li><p><strong>人类误差</strong> (训练集分布)  $&lt;\overset{\text{反映了不同分布的识别难度大小}}{===========}&gt;$ 人类误差 (开发集分布) </p>
 <p>$\Updownarrow$ 反映可避免偏差</p>
 </li>
 <li><p><strong>训练集误差</strong> (训练集分布)</p>
@@ -276,13 +276,13 @@ J=\frac{1}{m} \sum\limits^{m}_{i=1}\sum\limits^{4}_{j=1}L(\hat y^{(i)}_j,y^{(i)}
 <p>加入要建立一个语音识别系统，那么一般思路为：</p>
 <p>输入音频 x $\xrightarrow{MFCC算法}$ 提取低级特征 $\xrightarrow{ML算法}$ 找到音素 $\xrightarrow{组合}$ 单词  $\xrightarrow{剪辑}$ 输出文字 y                    </p>
 <p>而端到端深度学习的实现方式为直接建立输入语音 x 和文字脚本 y 的映射：</p>
-<p>输入音频 x   $\xrightarrow{ \quad \quad\quad\quad\quad\quad\quad 端到端深度学习\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad}$ 输出文字 y   </p>
+<p>输入音频 x   $\xrightarrow{ \quad \quad\quad\quad\quad\quad\quad 端到端深度学习 \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad}$ 输出文字 y   </p>
 </li>
 <li><p>例子 2</p>
 <p>机器翻译系统，传统机器学习思路：</p>
 <p>英语 $\rightarrow$ 文本分析 $\rightarrow$ 提取特征 $\rightarrow$ … $\rightarrow$ 中文</p>
 <p>端到端机器学习使用大量的英文和中文对应文本的数据集进行直接映射：</p>
-<p>英文$\xrightarrow{ \quad \quad\quad\quad\quad 端到端深度学习\quad\quad\quad\quad}$ 中文 </p>
+<p>英文$\xrightarrow{ \quad \quad\quad\quad\quad 端到端深度学习 \quad\quad\quad}$ 中文 </p>
 </li>
 </ul>
 <h3 id="end-to-end-DL-的优缺点"><a href="#end-to-end-DL-的优缺点" class="headerlink" title="end-to-end DL 的优缺点"></a>end-to-end DL 的优缺点</h3><ol>

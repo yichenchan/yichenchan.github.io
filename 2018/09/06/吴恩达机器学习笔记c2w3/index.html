@@ -24,12 +24,10 @@
 <li><p>随机取样</p>
 <p>当需要调整多个超参数时，尽量在网格中随机取样（下图右），而不是规则抽样（下图左）</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_2.3_1.png" alt=""></p>
-</li>
-</ol>
 <a id="more"></a>
 <p>   由于你不知道两个参数哪个更加重要，需要更多尝试。我们先假设超参数 1 更加重要：如果是左边的规则取样，那么即使取样 25 个点，实际上只尝试到了 5 个参数 1 的值，如果像右边那样随机取样，那么就可以尝试到 25 个参数 1 的值，而超参数 2 的值对结果影响并不大，所以随机取样更加合理。</p>
 <p>   如果同时要选择三个超参数，那么就在三维空间中随机取样。</p>
-<ol>
+</li>
 <li><p>区域定位的抽样方案</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_2.3_2.png" alt=""></p>
 <p>假设在上图的超参数样本空间中发现右下角那三个打圈的点表现更好，那么接下来对这些点所在的区域进行限定，然后在这个区域进行密度更高的随机抽样，如下图所示。</p>
@@ -45,9 +43,9 @@
 <p>假设我们要在线性尺度的 a，b 两点之间取样， 那么就需要在对数尺度 $log_{10}^a$ 和 $log_{10}^b$ 之间进行均匀取样得到 $r$ ，那么对应的超参数就是 $10^r$.</p>
 <p>假设现在我们要取样的是动量算法参数 $\beta$，它的合适范围在 0.9～0.999，我们可以先取样 $1-\beta$，它对应的范围在 0.1~0.001。使用上述方法取样得到 r，则最后的超参数为 $\beta=1-10^{r}$ .</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_2.3_7.png" alt=""></p>
+<p>随着 $\beta$ 趋近于 1 ，其结果对于 $\beta$ 的改变非常敏感，例如 $\beta$ 从0.9 变成 0.9005 这没什么大不了，结果几乎不变，但是如果 $\beta$ 从 0.999 变成 0.9995，它将会对你正在运行的算法产生巨大的影响，即：在 $\beta$ 趋近于 1 的时候，你能得到更高效的样本分布，搜索超参数时更有效率。</p>
 </li>
 </ol>
-<p>   随着 $\beta$ 趋近于 1 ，其结果对于 $\beta$ 的改变非常敏感，例如 $\beta$ 从0.9 变成 0.9005 这没什么大不了，结果几乎不变，但是如果 $\beta$ 从 0.999 变成 0.9995，它将会对你正在运行的算法产生巨大的影响，即：在 $\beta$ 趋近于 1 的时候，你能得到更高效的样本分布，搜索超参数时更有效率。</p>
 <h3 id="两者超参数搜索策略"><a href="#两者超参数搜索策略" class="headerlink" title="两者超参数搜索策略"></a>两者超参数搜索策略</h3><ol>
 <li><p>熊猫模式</p>
 <p>精心照料某个单一的模型，通常你需要处理一个非常庞大的数据集，但没有充足的计算资源，比如没有很多CPU 没有很多GPU，那你只能一次训练一个或者非常少量的模型，这种情况下 即使枯燥的训练你也要盯着，每天都在照看你的模型，尝试微调参数，就像一个母亲一样每天精心照料着你的模型，即使是在好几天甚至几周的训练过程中都不离不弃，照看着模型，观察性能曲线，耐心地微调学习率，这通常发生在你没有足够的计算资源同时训练几个模型的情况下。就像熊猫产子一样，数量稀少，经常一次一个，但是会投入全部精力，确保孩子平安无事。</p>
@@ -79,7 +77,7 @@
 <p>$z^{[l]}=W^{[l]}a^{[l-1]} \\ z_{norm}^{[l]}=\frac{z^{[l]}-\mu^{[l]}}{\sqrt{ {\sigma^2}^{[l]}+\varepsilon}} \\ \tilde{z}^{[l]}=\gamma^{[l]} z_{norm}^{[l]}+\beta^{[l]}$ </p>
 <p>其中参数 $z^{[l]},z_{norm}^{[l]},\tilde{z}^{[l]},\gamma^{[l]},\beta^{[l]}$ 的维度都是 $(n^{[l]},1)$ </p>
 <p>批量归一化的小批量梯度下降的实现过程：</p>
-<p>$for \quad t=1…num_minibatch:\\ \quad \quad 计算第 t 批次的前向传播\\ \quad \quad \quad \quad 在隐藏层中进行归一化，用\tilde{z}^{[l]}代替z^{[l]} \\ \quad \quad  用反向传播计算 dW^{[l]},d\beta^{[l]},d\gamma^{[l]} (没有 db^{[l]})\\ \quad \quad 更新参数 W^{[l]}:=W^{[l]}-\alpha dW^{[l]} \\ \quad \quad \quad \quad \quad \quad \beta^{[l]}:=\beta^{[l]}-\alpha d\beta^{[l]} \\ \quad \quad \quad \quad \quad \quad \gamma ^{[l]}:=\gamma^{[l]}-\alpha d\gamma^{[l]}$ </p>
+<p>$for \quad t=1…num_minibatch:\\ \quad \quad 计算第 t 批次的前向传播\\ \quad \quad \quad \quad 在隐藏层中进行归一化，用 \tilde{z}^{[l]}代替z^{[l]} \\ \quad \quad  用反向传播计算 dW^{[l]},d\beta^{[l]},d\gamma^{[l]} (没有 db^{[l]})\\ \quad \quad 更新参数 W^{[l]}:=W^{[l]}-\alpha dW^{[l]} \\ \quad \quad \quad \quad \quad \quad \beta^{[l]}:=\beta^{[l]}-\alpha d\beta^{[l]} \\ \quad \quad \quad \quad \quad \quad \gamma ^{[l]}:=\gamma^{[l]}-\alpha d\gamma^{[l]}$ </p>
 <h3 id="为什么-BN-如此有效"><a href="#为什么-BN-如此有效" class="headerlink" title="为什么 BN 如此有效"></a>为什么 BN 如此有效</h3><h4 id="协变量"><a href="#协变量" class="headerlink" title="协变量"></a>协变量</h4><p>首先要提到协变量 (Covariate)，什么是协变量？它与自变量是相对的。</p>
 <p>自变量：指研究者主动操纵，而引起因变量发生变化的因素或条件，因此自变量被看作是因变量的原因。在机器学习中，训练的模型可以称之为自变量。 </p>
 <p>协变量：在实验的设计中，协变量是一个独立变量(解释变量)，不为实验者所操纵，但仍影响响应。在机器学习中，模型的输入变量是协变量。</p>
