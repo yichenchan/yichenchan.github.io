@@ -1,0 +1,336 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="coursera 吴恩达深度学习 Specialization 笔记（course 3 week 2）—— 机器学习策略（二）"><meta name="keywords" content="吴恩达深度学习笔记,AI"><meta name="author" content="陈艺琛,undefined"><meta name="copyright" content="陈艺琛"><title>coursera 吴恩达深度学习 Specialization 笔记（course 3 week 2）—— 机器学习策略（二） | 陈艺琛的滑板公园</title><link rel="shortcut icon" href="/img/logo1.png"><link rel="stylesheet" href="/css/index.css?version=1.5.6"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css?version=1.5.6"><link rel="dns-prefetch" href="https://cdn.staticfile.org"><link rel="dns-prefetch" href="https://cdn.bootcss.com"><link rel="dns-prefetch" href="https://creativecommons.org"><link rel="dns-prefetch" href="https://hm.baidu.com"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?20c8efd323cd63b9f6bf846113eb6f60";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();</script><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容:${query}"}},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  }
+} </script></head><body><canvas class="fireworks"></canvas><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar"><div class="toggle-sidebar-info text-center"><span data-toggle="切换文章详情">切换站点概览</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#错误分析"><span class="toc-number">1.</span> <span class="toc-text">错误分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#如何进行错误分析"><span class="toc-number">1.1.</span> <span class="toc-text">如何进行错误分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#清除错误标记（标签）"><span class="toc-number">1.2.</span> <span class="toc-text">清除错误标记（标签）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#对于训练集"><span class="toc-number">1.2.1.</span> <span class="toc-text">对于训练集</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#对于开发-测试集"><span class="toc-number">1.2.2.</span> <span class="toc-text">对于开发/测试集</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#纠正开发集-测试集的原则"><span class="toc-number">1.3.</span> <span class="toc-text">纠正开发集/测试集的原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#建立第一个模型的建议"><span class="toc-number">1.4.</span> <span class="toc-text">建立第一个模型的建议</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#训练集-和-开发-测试集-的不匹配"><span class="toc-number">2.</span> <span class="toc-text">训练集 和 开发/测试集 的不匹配</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#在不同的分布上进行训练和测试"><span class="toc-number">2.1.</span> <span class="toc-text">在不同的分布上进行训练和测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据分布不匹配时的偏差-方差分析方法"><span class="toc-number">2.2.</span> <span class="toc-text">数据分布不匹配时的偏差/方差分析方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#提出问题"><span class="toc-number">2.2.1.</span> <span class="toc-text">提出问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#解决办法"><span class="toc-number">2.2.2.</span> <span class="toc-text">解决办法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#train-sets-和-dev-test-sets-不匹配问题的通用的解决方案"><span class="toc-number">2.2.3.</span> <span class="toc-text">train sets 和 dev/test sets 不匹配问题的通用的解决方案</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何改善数据不匹配问题"><span class="toc-number">2.3.</span> <span class="toc-text">如何改善数据不匹配问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#迁移学习-Transfer-learning"><span class="toc-number">3.</span> <span class="toc-text">迁移学习 (Transfer learning)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么叫迁移学习"><span class="toc-number">3.1.</span> <span class="toc-text">什么叫迁移学习</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何实现"><span class="toc-number">3.2.</span> <span class="toc-text">如何实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#为什么迁移学习有效？"><span class="toc-number">3.3.</span> <span class="toc-text">为什么迁移学习有效？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#什么时候采用迁移学习？"><span class="toc-number">3.4.</span> <span class="toc-text">什么时候采用迁移学习？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多任务学习-multi-task-learning"><span class="toc-number">4.</span> <span class="toc-text">多任务学习 (multi-task learning)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#如何实现-1"><span class="toc-number">4.1.</span> <span class="toc-text">如何实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#什么时候适用多任务学习"><span class="toc-number">4.2.</span> <span class="toc-text">什么时候适用多任务学习</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#端到端深度学习-end-to-end-deep-learning"><span class="toc-number">5.</span> <span class="toc-text">端到端深度学习 (end-to-end deep learning)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是“端到端深度学习”"><span class="toc-number">5.1.</span> <span class="toc-text">什么是“端到端深度学习”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#一些例子"><span class="toc-number">5.2.</span> <span class="toc-text">一些例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#end-to-end-DL-的优缺点"><span class="toc-number">5.3.</span> <span class="toc-text">end-to-end DL 的优缺点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#什么时候需要运用端到端深度学习"><span class="toc-number">5.4.</span> <span class="toc-text">什么时候需要运用端到端深度学习</span></a></li></ol></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/avater.jpg"></div><div class="author-info__name text-center">陈艺琛</div><div class="author-info__description text-center">a student of HITsz————坚持滑板，热爱摇滚，偶尔弹吉他，喜欢阅读，抽空打游戏，在AI小白之路上踽踽独行。</div><div class="follow-button"><a href="https://web.okjike.com/user/9e0ec001-4bb6-4cab-af94-ea8b2f6067ef/post" target="_blank">在即刻上关注我</a></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">文章</span><span class="pull-right">17</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">标签</span><span class="pull-right">15</span></a><a class="author-info-articles__categories article-meta" href="/categories"><span class="pull-left">分类</span><span class="pull-right">3</span></a></div><hr><div class="author-info-links"><div class="author-info-links__title text-center">友链</div><a class="author-info-links__name text-center" href="https://www.liaoxuefeng.com" target="_blank">廖雪峰的博客</a><a class="author-info-links__name text-center" href="https://mooc.study.163.com/smartSpec/detail/1001319001.htm" target="_blank">网易机器学习公开课</a><a class="author-info-links__name text-center" href="https://developers.google.com/machine-learning/crash-course/?hl=zh-cn" target="_blank">谷歌机器学习速成</a><a class="author-info-links__name text-center" href="http://www.hitsz.edu.cn/index.html" target="_blank">哈工大深圳主页</a></div></div></div><div id="content-outer"><div id="top-container" style="background-image: url(https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_topimg.png)"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">陈艺琛的滑板公园</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus"><a class="site-page social-icon search"><i class="fa fa-search"></i><span> 搜索</span></a><a class="site-page" href="/">主页</a><a class="site-page" href="/categories/学习笔记">学习笔记</a><a class="site-page" href="/categories/读书观影笔记">读书观影笔记</a><a class="site-page" href="/categories/个人随想">个人随想</a><a class="site-page" href="/categories/爱好和生活">爱好和生活</a><a class="site-page" href="/gallery">相册</a><a class="site-page" href="/archives">所有博客</a><a class="site-page" href="/tags">特色标签</a><a class="site-page" href="/about">关于我</a></span></div><div id="post-info"><div id="post-title">coursera 吴恩达深度学习 Specialization 笔记（course 3 week 2）—— 机器学习策略（二）</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2018-09-10</time><span class="post-meta__separator">|</span><i class="fa fa-inbox post-meta__icon" aria-hidden="true"></i><a class="post-meta__categories" href="/categories/学习笔记/">学习笔记</a></div></div></div><div class="layout" id="content-inner"><article id="post"><div class="article-container" id="post-content"><h2 id="错误分析"><a href="#错误分析" class="headerlink" title="错误分析"></a>错误分析</h2><p>如果你想得到一个训练算法来做人类可以做的任务，但是训练的算法还没有达到人类的效果，你就需要手动地检查算法中的错误，来知道你下一步该做什么，这个过程叫做错误分析。</p>
+<h3 id="如何进行错误分析"><a href="#如何进行错误分析" class="headerlink" title="如何进行错误分析"></a>如何进行错误分析</h3><p>假设训练一个分类猫的算法，准确率为 90%，错误率为 10%，我们对分错的样本进行检查，发现分错的样本中有一些把狗认成了猫，这时是否应该将重心转移到使分类器对狗的表现更好？</p>
+<p>错误分析：</p>
+<ul>
+<li>拿到约 <strong>100</strong> 张分类错误的开发集图片并进行手动检测<ul>
+<li>一般不需要检测上万张图片，几百张就足够了！</li>
+</ul>
+</li>
+<li>输出错误的图片里多少张狗</li>
+</ul>
+<p>假设只有 5 张，那么在错误图片中只有 5% 的狗，如果在狗的问题上花了大量的时间，那么就算是最好的情况，也<strong>最多</strong>只是把错误率从 10% 降到 9.5%，所以并不值得。但是假设 100 张错误图片里有 50 张狗的图片，那么可以确定很值得将时间花在狗身上，因为错误率<strong>最多</strong>可能从 10% 降到 5%.</p>
+<p>有时候我们可以并行考虑好几个 idea 是否值得付出努力。</p>
+<p>假设有下面几个提高猫咪分类器性能的 idea：</p>
+<ul>
+<li>提高对狗的识别</li>
+<li>提高对其他猫科动物的识别</li>
+<li>提高模型对模糊图像的性能</li>
+</ul>
+<p>如何评估这几个方案，可以列一张表，记录每个分类错误的图片分属于哪一个错误类别，然后计算百分比：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_3.2_1.png" alt=""></p>
+<p>通过上面的分析我们可以知道现在应该专注于提高对模糊的图片（43%）或者猫科动物图片（61%）的准确度，但仅仅是一个参考，因为这取决于获得这些数据<strong>容不容易</strong>，假如要获得猫科动物的图片需要大量的时间，那么这一方面就可以先放放。</p>
+<h3 id="清除错误标记（标签）"><a href="#清除错误标记（标签）" class="headerlink" title="清除错误标记（标签）"></a>清除错误标记（标签）</h3><p>当你检查数据集时发现一些输出标签 Y 标记错误，需不需要花时间修正这些标签。</p>
+<h4 id="对于训练集"><a href="#对于训练集" class="headerlink" title="对于训练集"></a>对于训练集</h4><ul>
+<li>深度学习算法在训练集上对于一些随机错误非常稳健，也就是说基本不需要管训练集上的一些随机的错误标记</li>
+<li>但是注意算法对系统误差比较敏感，如果标记员一直把白色的狗标记为猫，那么训练出来的分类器也会学着这么做</li>
+</ul>
+<h4 id="对于开发-测试集"><a href="#对于开发-测试集" class="headerlink" title="对于开发/测试集"></a>对于开发/测试集</h4><p>推荐的方法是在错误分析时增加一列“因为标签错误而分类错误”的统计：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_3.2_2.png" alt=""></p>
+<p>如上如图，加入标签错误是 6%，那么我们值得花时间去纠正这 6% 的样本的标签吗？</p>
+<p>假设算法的总错误率是 10% 或 2%，考虑这两种情况下标签错误对评估的影响：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>算法的总错误率</th>
+<th>10%</th>
+<th>2%</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>由标签错误引起的错误率</td>
+<td>0.6%</td>
+<td>0.6%</td>
+</tr>
+<tr>
+<td>由其他因素引起的错误率</td>
+<td>9.4%</td>
+<td>1.4%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>当总错误率为 10% 时，并不值得花时间去纠正这些错误的标签，因为即使纠正了也只提高 0.6% 的准确度，但是当总错误率为 2% 时，如果我们不纠正标签，那么他们引起的错误就占了一大半，这时纠正开发集中的标签错误就很有必要了。</p>
+<h3 id="纠正开发集-测试集的原则"><a href="#纠正开发集-测试集的原则" class="headerlink" title="纠正开发集/测试集的原则"></a>纠正开发集/测试集的原则</h3><ul>
+<li>对开发集和测试集进行一样的处理，确保他们来自相同的分布，当你纠正开发集中的一些问题，将这个过程也运用到测试集中</li>
+<li>考虑检查你算法预测正确的和预测错误的样本</li>
+<li>训练集 和 开发/测试集可以服从稍微不同的分布</li>
+</ul>
+<h3 id="建立第一个模型的建议"><a href="#建立第一个模型的建议" class="headerlink" title="建立第一个模型的建议"></a>建立第一个模型的建议</h3><ul>
+<li>设立开发/测试集和评估指标</li>
+<li><strong>快速地建立一个不那么复杂的初始模型</strong></li>
+<li>使用偏差/方差分析/错误分析进行模型的迭代</li>
+</ul>
+<h2 id="训练集-和-开发-测试集-的不匹配"><a href="#训练集-和-开发-测试集-的不匹配" class="headerlink" title="训练集 和 开发/测试集 的不匹配"></a>训练集 和 开发/测试集 的不匹配</h2><p>深度学习算法都希望有大量的训练数据，这导致很多团队将能找到的任何数据都塞进训练集，只为有更多的训练数据，即使很多这种数据来自于与开发集和测试集不同的分布。因此在深度学习时代，越来越多的团队正在使用的，训练数据并非来自与开发集和测试集相同的分布。</p>
+<h3 id="在不同的分布上进行训练和测试"><a href="#在不同的分布上进行训练和测试" class="headerlink" title="在不同的分布上进行训练和测试"></a>在不同的分布上进行训练和测试</h3><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_3.2_3.png" alt=""></p>
+<p>要训练一个猫咪分类器，目前手上有两种数据，一种是从网上爬下来的十分精美的图片 200000 个，另一种是用户上传的质量很差的图片 10000 张，这两种数据的分布差异非常大，但是我们更关心的是右边用户上传的数据，是我们的“靶子”，现在有两种数据集分配方案。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_3.2_4.png" alt=""></p>
+<p>第一种是将所有图片混合洗牌，其中 205000 张作为训练集，剩下的 5000 张在开发/测试集之间平分。这种分法有一个很大的缺点！按照这种分法，开发集和测试集中按照比例可以算出用户上传的照片只有约 119 张，大部分都是网上爬的图片，并没有很好地反映我们所关心的数据（用户的图片），也就是说靶子放错了！</p>
+<p>而正确的第二种分法是：将所有网上爬的 200000 张图片<strong>加上用户的 5000 张作为训练集</strong>，而剩下的用户的 5000 张平分为开发集和测试集，这样一来，你的开发集就瞄准了正确的目标。但缺点就是使得训练集分布和开发集分布有些不同，但是长期来说性能更好。</p>
+<p>总结：</p>
+<ul>
+<li>在某些情况下，可以允许训练集和开发/测试集来自不同的分布，以可以获得更大的训练集</li>
+<li>但是注意：训练集中<strong>也需要</strong>包含足够的开发集分布数据，来避免数据不匹配问题！</li>
+</ul>
+<h3 id="数据分布不匹配时的偏差-方差分析方法"><a href="#数据分布不匹配时的偏差-方差分析方法" class="headerlink" title="数据分布不匹配时的偏差/方差分析方法"></a>数据分布不匹配时的偏差/方差分析方法</h3><p> 当你的训练集、开发集、测试集来自不同的分布时，偏差和方差的分析方法也会相应变化。</p>
+<h4 id="提出问题"><a href="#提出问题" class="headerlink" title="提出问题"></a>提出问题</h4><p>对于一个猫分类器，假设人类误差是 0，且训练集和开发集数据来自不同分布，训练集误差为 1%，开发集误差为 10%，那么它们之间 9% 的差距到底是因为 (1)模型泛化能力不足导致方差太大，还是因为 (2)训练集数据分布不同？</p>
+<h4 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h4><p>为了找出原因，我们定义一个新的数据集：训练-开发集 (training-dev set).</p>
+<p>训练-开发集：将所有训练集数据洗牌，取出一小块作为训练-开发集，它的分布与训练集相同。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_3.2_5.png" alt=""></p>
+<blockquote>
+<p>分布相同：</p>
+<ul>
+<li>训练集 $\leftrightarrow$ 训练-开发集</li>
+<li>开发集 $\leftrightarrow$ 测试集</li>
+</ul>
+</blockquote>
+<p>划分好之后，计算出模型在如下各个数据集上的误差如下表：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">例子</th>
+<th style="text-align:center">1</th>
+<th style="text-align:center">2</th>
+<th style="text-align:center">3</th>
+<th style="text-align:center">4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">训练集误差</td>
+<td style="text-align:center">1%</td>
+<td style="text-align:center">1%</td>
+<td style="text-align:center">10%</td>
+<td style="text-align:center">10%</td>
+</tr>
+<tr>
+<td style="text-align:left">训练-开发集误差</td>
+<td style="text-align:center">9%</td>
+<td style="text-align:center">1.5%</td>
+<td style="text-align:center">11%</td>
+<td style="text-align:center">11%</td>
+</tr>
+<tr>
+<td style="text-align:left">开发集误差</td>
+<td style="text-align:center">10%</td>
+<td style="text-align:center">10%</td>
+<td style="text-align:center">12%</td>
+<td style="text-align:center">20%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul>
+<li>例子1：训练集误差 1%，训练-开发集误差 9%，两者同分布都差距这么大，说明模型泛化能力不好，属于高方差问题。</li>
+<li>例子2：在同样是在没训练过的数据集上预测，与训练集分布一样的训练-开发集误差很小，而与训练集分布不同的开发集（你所关心的）却误差很大，算法未在你所关心的分布上训练的很好，这就是<strong>数据不匹配</strong>问题 (mismatch problem)。</li>
+<li>例子3：人类误差 0，训练集误差却高达 10%，这是明显是高偏差问题。</li>
+<li>例子4：10% 说明高偏差；11%～20% 说明数据不匹配程度相当大。</li>
+</ul>
+<h4 id="train-sets-和-dev-test-sets-不匹配问题的通用的解决方案"><a href="#train-sets-和-dev-test-sets-不匹配问题的通用的解决方案" class="headerlink" title="train sets 和 dev/test sets 不匹配问题的通用的解决方案"></a>train sets 和 dev/test sets 不匹配问题的通用的解决方案</h4><p>一个模型可能的误差类型：</p>
+<ul>
+<li><p><strong>人类误差</strong> (训练集分布)  $&lt;\xlongequal{反映了不同分布的识别难度大小}&gt; $ 人类误差 (开发集分布) </p>
+<p>$\Updownarrow$ 反映可避免偏差</p>
+</li>
+<li><p><strong>训练集误差</strong> (训练集分布)</p>
+<p> $\Updownarrow$ 反映方差情况</p>
+</li>
+<li><p><strong>训练-开发集误差</strong> (训练集分布)</p>
+<p> $\Updownarrow$ 反映（训练集和开发集）数据不匹配情况</p>
+</li>
+<li><p><strong>开发集误差</strong> (开发/测试集分布)</p>
+<p> $\Updownarrow$ 反映算法对开发集的过拟合情况，因为如果这个差距太大，则也许将神经网络</p>
+<p> $\Updownarrow$ 调的太偏向开发集了，此时需要一个更大的开发集</p>
+</li>
+<li><p><strong>测试集误差</strong> (开发/测试集分布)</p>
+</li>
+</ul>
+<h3 id="如何改善数据不匹配问题"><a href="#如何改善数据不匹配问题" class="headerlink" title="如何改善数据不匹配问题"></a>如何改善数据不匹配问题</h3><ul>
+<li>人工分析误差，试着理解训练集与开发/测试集之间的差异<ul>
+<li>举个例子，在识别车载语音识别时，可能开发集中很多车辆噪音，而训练集没有，这是由实际情况决定的</li>
+</ul>
+</li>
+<li>想方设法使得训练集与之更相似：可以收集更多与开发/测试集相似的数据加入训练集，或者进行人工合成数据加入训练集，只要合成的数据让人类觉得很真实，那么就可以骗过算法<ul>
+<li>比如模拟车载噪音数据，将训练集中干净的音频加上一段噪音合成出噪音下的说话声。但是注意：一小段<strong>重复</strong>用来合成的汽车噪音会使得学习算法对这段声音产生过拟合</li>
+<li>再比如无人驾驶中的汽车识别，可以通过三维建模画出我们需要的汽车样子。但是注意：建模所用的汽车模型非常有限，加入只有 20 种，那么神经网络很可能对这 20 种汽车产生过拟合</li>
+</ul>
+</li>
+</ul>
+<h2 id="迁移学习-Transfer-learning"><a href="#迁移学习-Transfer-learning" class="headerlink" title="迁移学习 (Transfer learning)"></a>迁移学习 (Transfer learning)</h2><h3 id="什么叫迁移学习"><a href="#什么叫迁移学习" class="headerlink" title="什么叫迁移学习"></a>什么叫迁移学习</h3><p>深度学习中最有力的方法之一，是有时你可以把在一个任务中神经网络学习到的东西，应用到另一个任务中去。比如，你可以让神经网络学习去识别物体，比如猫，然后用学习到的（一部分）知识来帮助你更好地识别X射线的结果。这就是所谓的迁移学习。</p>
+<h3 id="如何实现"><a href="#如何实现" class="headerlink" title="如何实现"></a>如何实现</h3><p>假如我们我们用猫狗的图片训练了一个如下的图片识别的神经网络：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_3.2_6.png" alt=""></p>
+<p>如果我们想把这个模型应用到另一个场景，比如 x 光片的诊断，实现方法是移除这个神经网络的最后一层和其相关的权重，如下图所示：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_3.2_7.png" alt=""></p>
+<p>要实现迁移学习，要做的是：</p>
+<ul>
+<li>将数据集换成 x 光诊断的图片</li>
+<li>随机初始化新的最后一层的权重 W 和 偏差 b</li>
+<li>重新训练该网络<ul>
+<li>如果数据量小：可以只训练最后一层的参数，保留其他的参数</li>
+<li>如果数据量大：可以训练所有层</li>
+</ul>
+</li>
+</ul>
+<p><strong>预训练 (pre training)</strong>：我们把猫狗图片训练的模型用到其他地方，那么用猫狗图片对模型的训练就称之为预训练。预训练对模型的权重进行了预初始化，其他的训练是在预初始化权重的基础上继续训练。</p>
+<p><strong>微调 (fine tuning)</strong>：在预训练的基础上继续训练，比如上面的再用 x 光诊断图片继续训练，对权重进行更新，称之为“微调”。</p>
+<p>有时候你也可以将最后一层移除后增加一些新的层，然后对新建的几层重新训练：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_3.2_8.png" alt=""></p>
+<h3 id="为什么迁移学习有效？"><a href="#为什么迁移学习有效？" class="headerlink" title="为什么迁移学习有效？"></a>为什么迁移学习有效？</h3><p>是因为从从大规模的图像识别数据集中学习到的边界检测，曲线检测，明暗对象检测等低层次的信息，或许能够帮助你的学习算法更好地去进行放射扫描结果的诊断。它会在图像的组织结构和自然特性中学习到很多信息，其中一些信息会非常的有帮助。所以当神经网络学会了图像识别意味着它可能学习到了以下信息：关于不同图片的点，线，曲面等等信息，在不同图片中看起来是什么样子的。或许关于一个物体对象的很小的细节，都能够帮助你在放射信息诊断的神经网络中，学习得更快一些或者减少学习需要的数据。</p>
+<h3 id="什么时候采用迁移学习？"><a href="#什么时候采用迁移学习？" class="headerlink" title="什么时候采用迁移学习？"></a>什么时候采用迁移学习？</h3><ul>
+<li><p>任务 A 有着比任务 B 多得多的数据，可以从 A 迁移到 B</p>
+<ul>
+<li><p>例如，假设你在一个图像识别任务中拥有一百万个样本，这就意味着大量数据中的低层次特征信息或者大量的有帮助的特征信息在神经网络的前几层被学习到了。但是对于放射扫描结果的诊断任务，或许仅仅是100个 X 光扫描样本。所以你从图像识别中学习到的大量的信息可以被用于迁移并且这些信息会有效地帮助你处理好放射诊疗。</p>
+</li>
+<li><p>总结：只能大数据模型迁移到小数据模型，而不能小数据模型迁移到大数据模型。</p>
+</li>
+</ul>
+</li>
+<li><p>任务 A 和任务 B 有着相同的输入</p>
+<ul>
+<li>例如识别猫狗和诊断 X 光输入的都是图片</li>
+</ul>
+</li>
+<li><p>当你认为任务 A 中的低层次特征会帮助到任务 B </p>
+<ul>
+<li>例如你判断两个任务有某种可以互通的特征，比如两者都是识别物体或都是语音识别</li>
+</ul>
+</li>
+</ul>
+<h2 id="多任务学习-multi-task-learning"><a href="#多任务学习-multi-task-learning" class="headerlink" title="多任务学习 (multi-task learning)"></a>多任务学习 (multi-task learning)</h2><p>在多任务学习中，几个任务一起进行，让神经网络同时做几件事情。</p>
+<h3 id="如何实现-1"><a href="#如何实现-1" class="headerlink" title="如何实现"></a>如何实现</h3><p>在自动驾驶时拍下一张照片需要识别出照片中是否存在一些物体，如果有就置 1，否则为 0 ：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_3.2_9.png" alt=""></p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">行人</th>
+<th style="text-align:center">0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">汽车</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">交通牌</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">信号灯</td>
+<td style="text-align:center">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>于是输出标签变为（4，m）的矩阵：</p>
+<script type="math/tex; mode=display">
+Y=\begin{bmatrix}
+ |&  |&  & | & \\ 
+ y^{(1)}& y^{(2)} &,... , & y^{(m)} & \\ 
+ |& | &  & | & 
+\end{bmatrix}</script><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_3.2_10.png" alt=""></p>
+<p>搭建上图中的网络进行训练，最后一层有四个单元，表示识别的四种物体的概率，那么代价函数可以表示为：</p>
+<script type="math/tex; mode=display">
+J=\frac{1}{m} \sum\limits^{m}_{i=1}\sum\limits^{4}_{j=1}L(\hat y^{(i)}_j,y^{(i)}_j)</script><ul>
+<li><p>有时候 4 个标签会有缺失（下图中的 “？”），你仍然可以进行训练，只需要省略缺失项， $\sum\limits^{4}_{j=1}$ 只对有标签的值进行求和即可</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_3.2_11.png" alt=""></p>
+</li>
+<li><p>该方法相当于将四个独立的神经网络合在一起，但是效果更好</p>
+</li>
+</ul>
+<h3 id="什么时候适用多任务学习"><a href="#什么时候适用多任务学习" class="headerlink" title="什么时候适用多任务学习"></a>什么时候适用多任务学习</h3><ul>
+<li>你要训练的任务共享一些低层次的特征<ul>
+<li>例如行人、交通灯、汽车、交通牌这些物体都是道路特征</li>
+</ul>
+</li>
+<li>非硬性：多任务中每个任务的数据量相当相似<ul>
+<li>如果你集中在某一任务上，其他任务比这单一任务有多得多的数据</li>
+</ul>
+</li>
+<li>如果你可以训练一个足够大的网络来做好所有的任务<ul>
+<li>如果神经网络不够大，与单独训练每个任务相比，多任务训练会损害准确率</li>
+</ul>
+</li>
+</ul>
+<h2 id="端到端深度学习-end-to-end-deep-learning"><a href="#端到端深度学习-end-to-end-deep-learning" class="headerlink" title="端到端深度学习 (end-to-end deep learning)"></a>端到端深度学习 (end-to-end deep learning)</h2><h3 id="什么是“端到端深度学习”"><a href="#什么是“端到端深度学习”" class="headerlink" title="什么是“端到端深度学习”"></a>什么是“端到端深度学习”</h3><p>一个由许多阶段组成的学习系统，输入 x，输出 y，如果我们将其中的许多阶段用单个神经网络进行替代，直接建立从输入端 x 到输出端 y 的映射，就叫做“端到端深度学习”。</p>
+<h3 id="一些例子"><a href="#一些例子" class="headerlink" title="一些例子"></a>一些例子</h3><ul>
+<li><p>例子 1</p>
+<p>加入要建立一个语音识别系统，那么一般思路为：</p>
+<p>输入音频 x $\xrightarrow{MFCC算法}$ 提取低级特征 $\xrightarrow{ML算法}$ 找到音素 $\xrightarrow{组合}$ 单词  $\xrightarrow{剪辑}$ 输出文字 y                    </p>
+<p>而端到端深度学习的实现方式为直接建立输入语音 x 和文字脚本 y 的映射：</p>
+<p>输入音频 x   $\xrightarrow{ \quad \quad\quad\quad\quad\quad\quad 端到端深度学习\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad}$ 输出文字 y   </p>
+</li>
+<li><p>例子 2</p>
+<p>机器翻译系统，传统机器学习思路：</p>
+<p>英语 $\rightarrow$ 文本分析 $\rightarrow$ 提取特征 $\rightarrow$ … $\rightarrow$ 中文</p>
+<p>端到端机器学习使用大量的英文和中文对应文本的数据集进行直接映射：</p>
+<p>英文$\xrightarrow{ \quad \quad\quad\quad\quad 端到端深度学习\quad\quad\quad\quad}$ 中文 </p>
+</li>
+</ul>
+<h3 id="end-to-end-DL-的优缺点"><a href="#end-to-end-DL-的优缺点" class="headerlink" title="end-to-end DL 的优缺点"></a>end-to-end DL 的优缺点</h3><ol>
+<li>优点<ul>
+<li>端到端数据学习让数据“说话”，从 X $\rightarrow$ Y 的映射中更好地学习到数据内在的统计学特征，而不是被迫去反映人的先见<ul>
+<li>例如传统机器学习利用到语言中“音素”的概念，但是这个概念是是一个人造的产物，无法确定让算法使用“音素”是不是有利的</li>
+</ul>
+</li>
+<li>需要更少的人工设计组件，简化工作流程</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>为了得到 X 到 Y 的映射，需要非常大量的 (X $\rightarrow$Y) 数据</li>
+<li>它排除了一些具有潜在用途的手工设计组件<ul>
+<li>如果数据量不够，那么一个精心手工设计的系统实际上可以向算法中注入人类关于这个问题的知识，是很有帮助的</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="什么时候需要运用端到端深度学习"><a href="#什么时候需要运用端到端深度学习" class="headerlink" title="什么时候需要运用端到端深度学习"></a>什么时候需要运用端到端深度学习</h3><p>关键问题：你是否有充足的数据去学习出具有能够映射 X 到 Y 所需复杂度的方程？</p>
+</div></article><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/吴恩达深度学习笔记/">吴恩达深度学习笔记</a><a class="post-meta__tags" href="/tags/AI/">AI</a></div><div class="post-qr-code"><div class="post-qr-code-item"><img class="post-qr-code__img" src="/img/qr1.png"><div class="post-qr-code__desc">微信捐赠</div></div><div class="post-qr-code-item"><img class="post-qr-code__img" src="/img/qr2.jpg"><div class="post-qr-code__desc">支付宝捐赠</div></div></div><div class="social-share"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/js/social-share.min.js"></script><nav id="pagination"><div class="next-post pull-right"><a href="/2018/09/08/吴恩达机器学习笔记c3w1/"><span>coursera 吴恩达深度学习 Specialization 笔记（course 3 week 1）—— 机器学习策略（一）</span><i class="fa fa-chevron-right"></i></a></div></nav><div class="post-adv"><iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=530 height=86 src="//music.163.com/outchain/player?type=2&id=566993785&auto=1&height=66"></iframe></div><div id="lv-container" data-id="city" data-uid="MTAyMC8zODM1Mi8xNDg4MA=="><script>(function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+})(document, 'script');</script></div></div></div><footer><div class="layout" id="footer"><div class="copyright">&copy;2018 By 陈艺琛</div><div class="framework-info"><span>驱动 - </span><a href="http://hexo.io"><span>Hexo</span></a><span class="footer-separator">|</span><span>主题 - </span><a href="https://github.com/Molunerfinn/hexo-theme-melody"><span>Melody</span></a></div><div class="footer_custom_text">这里是我的一亩自耕田，记录自己的学习过程，生活随想和读书笔记，感谢您的参观！</div><div class="busuanzi"><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file-o"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="/js/third-party/anime.min.js"></script><script src="/js/third-party/jquery.min.js"></script><script src="/js/third-party/jquery.fancybox.min.js"></script><script src="/js/third-party/velocity.min.js"></script><script src="/js/third-party/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.5.6"></script><script src="/js/fancybox.js?version=1.5.6"></script><script src="/js/sidebar.js?version=1.5.6"></script><script src="/js/copy.js?version=1.5.6"></script><script src="/js/fireworks.js?version=1.5.6"></script><script src="/js/transition.js?version=1.5.6"></script><script src="/js/scroll.js?version=1.5.6"></script><script src="/js/head.js?version=1.5.6"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  CommonHTML: {
+    linebreaks: { automatic: true, width: "90% container" }
+  },
+  "HTML-CSS": { 
+    linebreaks: { automatic: true, width: "90% container" }
+  },
+  "SVG": { 
+    linebreaks: { automatic: true, width: "90% container" }
+  }
+});
+</script><script type="text/x-mathjax-config">MathJax.Hub.Queue(function() {
+  var all = MathJax.Hub.getAllJax(), i;
+  for (i=0; i < all.length; i += 1) {
+    all[i].SourceElement().parentNode.className += ' has-jax';
+  }
+});
+</script><script src="https://cdn.bootcss.com/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script src="/js/search/local-search.js"></script><div class="search-dialog" id="local-search"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章"></div></div></div><hr><div id="local-search-results"><div id="local-hits"></div><div id="local-stats"><div class="local-search-stats__hr" id="hr"><span>由</span> <a href="https://github.com/wzpan/hexo-generator-search" style="color:#49B1F5;">hexo-generator-search</a>
+ <span>提供支持</span></div></div></div><span class="search-close-button"><i class="fa fa-times"></i></span></div><div class="search-mask"></div></body></html>

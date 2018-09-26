@@ -1,0 +1,277 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="coursera 吴恩达深度学习 Specialization 笔记（course 1 week 2）—— 神经网络基础"><meta name="keywords" content="吴恩达深度学习笔记,AI,神经网络,逻辑回归"><meta name="author" content="陈艺琛,undefined"><meta name="copyright" content="陈艺琛"><title>coursera 吴恩达深度学习 Specialization 笔记（course 1 week 2）—— 神经网络基础 | 陈艺琛的滑板公园</title><link rel="shortcut icon" href="/img/logo1.png"><link rel="stylesheet" href="/css/index.css?version=1.5.6"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css?version=1.5.6"><link rel="dns-prefetch" href="https://cdn.staticfile.org"><link rel="dns-prefetch" href="https://cdn.bootcss.com"><link rel="dns-prefetch" href="https://creativecommons.org"><link rel="dns-prefetch" href="https://hm.baidu.com"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?20c8efd323cd63b9f6bf846113eb6f60";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();</script><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容:${query}"}},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  }
+} </script></head><body><canvas class="fireworks"></canvas><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar"><div class="toggle-sidebar-info text-center"><span data-toggle="切换文章详情">切换站点概览</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#二元分类"><span class="toc-number">1.</span> <span class="toc-text">二元分类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#定义"><span class="toc-number">1.1.</span> <span class="toc-text">定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#例子——判断图片是（1）不是（0）猫"><span class="toc-number">1.2.</span> <span class="toc-text">例子——判断图片是（1）不是（0）猫</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#图片特征值的提取"><span class="toc-number">1.3.</span> <span class="toc-text">图片特征值的提取</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#符号说明"><span class="toc-number">2.</span> <span class="toc-text">符号说明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#逻辑回归-Logistics-Regression（针对二元分类问题）"><span class="toc-number">3.</span> <span class="toc-text">逻辑回归 Logistics Regression（针对二元分类问题）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#描述"><span class="toc-number">3.1.</span> <span class="toc-text">描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#另外一种描述方式"><span class="toc-number">3.2.</span> <span class="toc-text">另外一种描述方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#损失函数（lost-function）"><span class="toc-number">3.3.</span> <span class="toc-text">损失函数（lost function）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#概括"><span class="toc-number">3.3.1.</span> <span class="toc-text">　概括</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#损失函数定义"><span class="toc-number">3.3.2.</span> <span class="toc-text">损失函数定义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#常用的损失函数"><span class="toc-number">3.3.3.</span> <span class="toc-text">常用的损失函数</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代价函数（Cost-function）"><span class="toc-number">3.4.</span> <span class="toc-text">代价函数（Cost function）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代价函数的证明"><span class="toc-number">3.5.</span> <span class="toc-text">代价函数的证明</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#用梯度下降法训练参数-w-和-b"><span class="toc-number">4.</span> <span class="toc-text">用梯度下降法训练参数 w 和 b</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#概括-1"><span class="toc-number">4.1.</span> <span class="toc-text">概括</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#梯度下降法原理"><span class="toc-number">4.2.</span> <span class="toc-text">梯度下降法原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#单变量梯度下降法（先忽略b）"><span class="toc-number">4.3.</span> <span class="toc-text">单变量梯度下降法（先忽略b）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多变量梯度下降法（w，b）"><span class="toc-number">4.4.</span> <span class="toc-text">多变量梯度下降法（w，b）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#求代价函数的导数"><span class="toc-number">5.</span> <span class="toc-text">求代价函数的导数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#求损失函数的导数"><span class="toc-number">5.1.</span> <span class="toc-text">求损失函数的导数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#求代价函数的导数-1"><span class="toc-number">5.2.</span> <span class="toc-text">求代价函数的导数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#向量化（Vectorization）"><span class="toc-number">6.</span> <span class="toc-text">向量化（Vectorization）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是向量化"><span class="toc-number">6.1.</span> <span class="toc-text">什么是向量化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#向量化的好处"><span class="toc-number">6.2.</span> <span class="toc-text">向量化的好处</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#一些向量化的例子"><span class="toc-number">6.3.</span> <span class="toc-text">一些向量化的例子</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#用向量化实现逻辑回归"><span class="toc-number">7.</span> <span class="toc-text">用向量化实现逻辑回归</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#用-for-循环实现"><span class="toc-number">7.1.</span> <span class="toc-text">用 for 循环实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#向量化实现"><span class="toc-number">7.2.</span> <span class="toc-text">向量化实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-number">7.3.</span> <span class="toc-text">总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Python中的广播（broadcasting）"><span class="toc-number">8.</span> <span class="toc-text">Python中的广播（broadcasting）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在使用-numpy-时的注意事项"><span class="toc-number">9.</span> <span class="toc-text">在使用 numpy 时的注意事项</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#例子"><span class="toc-number">9.1.</span> <span class="toc-text">例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#减少错误的技巧"><span class="toc-number">9.2.</span> <span class="toc-text">减少错误的技巧</span></a></li></ol></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/avater.jpg"></div><div class="author-info__name text-center">陈艺琛</div><div class="author-info__description text-center">a student of HITsz————坚持滑板，热爱摇滚，偶尔弹吉他，喜欢阅读，抽空打游戏，在AI小白之路上踽踽独行。</div><div class="follow-button"><a href="https://web.okjike.com/user/9e0ec001-4bb6-4cab-af94-ea8b2f6067ef/post" target="_blank">在即刻上关注我</a></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">文章</span><span class="pull-right">17</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">标签</span><span class="pull-right">15</span></a><a class="author-info-articles__categories article-meta" href="/categories"><span class="pull-left">分类</span><span class="pull-right">3</span></a></div><hr><div class="author-info-links"><div class="author-info-links__title text-center">友链</div><a class="author-info-links__name text-center" href="https://www.liaoxuefeng.com" target="_blank">廖雪峰的博客</a><a class="author-info-links__name text-center" href="https://mooc.study.163.com/smartSpec/detail/1001319001.htm" target="_blank">网易机器学习公开课</a><a class="author-info-links__name text-center" href="https://developers.google.com/machine-learning/crash-course/?hl=zh-cn" target="_blank">谷歌机器学习速成</a><a class="author-info-links__name text-center" href="http://www.hitsz.edu.cn/index.html" target="_blank">哈工大深圳主页</a></div></div></div><div id="content-outer"><div id="top-container" style="background-image: url(https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_topimg.png)"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">陈艺琛的滑板公园</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus"><a class="site-page social-icon search"><i class="fa fa-search"></i><span> 搜索</span></a><a class="site-page" href="/">主页</a><a class="site-page" href="/categories/学习笔记">学习笔记</a><a class="site-page" href="/categories/读书观影笔记">读书观影笔记</a><a class="site-page" href="/categories/个人随想">个人随想</a><a class="site-page" href="/categories/爱好和生活">爱好和生活</a><a class="site-page" href="/gallery">相册</a><a class="site-page" href="/archives">所有博客</a><a class="site-page" href="/tags">特色标签</a><a class="site-page" href="/about">关于我</a></span></div><div id="post-info"><div id="post-title">coursera 吴恩达深度学习 Specialization 笔记（course 1 week 2）—— 神经网络基础</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2018-08-07</time><span class="post-meta__separator">|</span><i class="fa fa-inbox post-meta__icon" aria-hidden="true"></i><a class="post-meta__categories" href="/categories/学习笔记/">学习笔记</a></div></div></div><div class="layout" id="content-inner"><article id="post"><div class="article-container" id="post-content"><p>本周主要介绍<strong>逻辑回归</strong>算法 (Logistics Regression)。</p>
+<h2 id="二元分类"><a href="#二元分类" class="headerlink" title="二元分类"></a>二元分类</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>输出值为离散的两个值，即 1 或者 0</p>
+<h3 id="例子——判断图片是（1）不是（0）猫"><a href="#例子——判断图片是（1）不是（0）猫" class="headerlink" title="例子——判断图片是（1）不是（0）猫"></a>例子——判断图片是（1）不是（0）猫</h3><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.1.png" alt=""></p>
+<ul>
+<li>目标：输入图片的特征向量 x，预测对应的输出是 1 还是 0 </li>
+</ul>
+<h3 id="图片特征值的提取"><a href="#图片特征值的提取" class="headerlink" title="图片特征值的提取"></a>图片特征值的提取</h3><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.2.png" alt=""><br><a id="more"></a></p>
+<ul>
+<li>图片特征值的提取：每张图片有三个颜色通道，把每个通道的所有像素值取出展成一个向量，每张图片（像素为 64*64）的所有特征值为 64x64x3 = 12288 个，组成一个维度为 12288 的列向量 X </li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.4.png" alt=""></p>
+<ul>
+<li>输入向量的维度 n =  $n_x$= 12288</li>
+</ul>
+<h2 id="符号说明"><a href="#符号说明" class="headerlink" title="符号说明"></a>符号说明</h2><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.3.png" alt=""></p>
+<h2 id="逻辑回归-Logistics-Regression（针对二元分类问题）"><a href="#逻辑回归-Logistics-Regression（针对二元分类问题）" class="headerlink" title="逻辑回归 Logistics Regression（针对二元分类问题）"></a>逻辑回归 Logistics Regression（针对二元分类问题）</h2><h3 id="描述"><a href="#描述" class="headerlink" title="描述"></a>描述</h3><p>逻辑回归是一个很小的神经网络，已知一个数据集，我们用它拟合出一个模型，这个模型能够实现：</p>
+<ul>
+<li><p>输入特征值 $x$</p>
+</li>
+<li><p>输出预测值 $\hat y$： $\hat{y} = P(y = 1|x) , 0 \leq\hat{y} \leq1 $，即标签值 y = 1 的概率</p>
+</li>
+</ul>
+<p>那么如何得到某个输入 x 的标签值为 1 的概率呢，用如下式子来进行预测：</p>
+<script type="math/tex; mode=display">
+\hat{y} = w^Tx + b</script><p>但是由于概率的值在 0 和 1 之间，而 $w^T x+ b$ 可能大于 1 或者小于 0，所以这不是一个好的算法，于是我们将其通过一个 <strong>sigmoid函数</strong> 改造一下：</p>
+<script type="math/tex; mode=display">
+\hat{y} =\sigma( w^Tx + b)</script><ul>
+<li>输入特征向量 x： 𝑥 ∈ $ℝ^{n_x}$, 即 $x = \left ( x_{1},x_{2},x_{3},…,x_{n_x} \right )^T$,$n_x$ 为特征数目</li>
+<li>训练标签 y：y $\in$ { 0 , 1 }</li>
+<li>权重 w：$w = \left ( w_{1},w_{2},w_{3},…,w_{n_x} \right )^T$, $n_x$ 为特征数目</li>
+<li>偏置量 b：实数</li>
+<li>sigmoid 函数：$s=\sigma(z)=\frac{1}{1+e^{-z}}$</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.5.png" alt=""></p>
+<blockquote>
+<p>sigmoid 函数的合理性在于：</p>
+<ul>
+<li>当 z 是一个很大的数时， $\sigma (z) = 1$</li>
+<li>当 z 是一个很小的数时， $\sigma(z)=0$</li>
+<li>当 z = 0 时，$\sigma(z)=0.5$</li>
+</ul>
+<p>这样就能很好地估计介于 0 和 1 之间的概率</p>
+</blockquote>
+<h3 id="另外一种描述方式"><a href="#另外一种描述方式" class="headerlink" title="另外一种描述方式"></a>另外一种描述方式</h3><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.6.png" alt=""></p>
+<script type="math/tex; mode=display">
+\hat{y} =\sigma( \Theta^Tx)</script><p>其中：</p>
+<ul>
+<li>$x = (1,x_{1},x_{2},x_{3},…,x_{n_x})^T$</li>
+<li>$\Theta = (b,w_{1},w_{2},w_{3},…,w_{n_x})^T$</li>
+</ul>
+<h3 id="损失函数（lost-function）"><a href="#损失函数（lost-function）" class="headerlink" title="损失函数（lost function）"></a>损失函数（lost function）</h3><p>为了训练参数 w 和 b，也就是找到最优的拟合模型，我们定义一个<strong>损失函数</strong></p>
+<h4 id="概括"><a href="#概括" class="headerlink" title="　概括"></a>　概括</h4><blockquote>
+<p>右上角的括号 (i) 表示第 i 个训练实例</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.7.png" alt=""></p>
+<h4 id="损失函数定义"><a href="#损失函数定义" class="headerlink" title="损失函数定义"></a>损失函数定义</h4><p>损失函数评估了预测值 $\hat y^{(i)}$ 和 已知的期望值 $y^{(i)}$ 之间的差异，或者说计算了单个训练样本的偏差</p>
+<h4 id="常用的损失函数"><a href="#常用的损失函数" class="headerlink" title="常用的损失函数"></a>常用的损失函数</h4><p>（1）</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.9.png" alt=""></p>
+<blockquote>
+<p>逻辑回归中一般不适用此损失函数，因为会使优化问题变成非凸问题，无法使用梯度下降法找到全局最优解</p>
+</blockquote>
+<p>（2）</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.10.png" alt=""></p>
+<blockquote>
+<p>该损失函数的合理性在于：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.11.png" alt=""></p>
+</blockquote>
+<h3 id="代价函数（Cost-function）"><a href="#代价函数（Cost-function）" class="headerlink" title="代价函数（Cost function）"></a>代价函数（Cost function）</h3><p>代价函数指的是<strong>整个</strong>训练集的损失函数的<strong>平均值</strong>，我们的最终目的就是找到使整个代价函数值最小的参数 w 和 b</p>
+<blockquote>
+<ul>
+<li>我们希望用 $\hat{y} =\sigma( w^Tx + b)$ 模型得出的预测值和已知的实际值之间的差异最小，也就是代价函数最小，这样才能证明这个模型（假设参数为 $w_{best},b_{best}$）是所有包含参数 w，b 的模型里最合理的，也是最符合实际的</li>
+<li>从输入到求得代价函数的过程称之为<strong>前向传播 (forward propagation)</strong> </li>
+</ul>
+</blockquote>
+<p>代价函数：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.12.png" alt=""></p>
+<h3 id="代价函数的证明"><a href="#代价函数的证明" class="headerlink" title="代价函数的证明"></a>代价函数的证明</h3><p>二元分类问题类似于概率论里的“0-1分布”.</p>
+<ul>
+<li>假设当结果为 1 的概率  $P(y=1|x)=\hat y$</li>
+<li>则当结果为 0 的概率就是  $P(y=0|x)=1-\hat y$</li>
+<li>则结果为 y（0或1）的概率为 $P(y|x)=\hat y^y(1-\hat y)^{1-y}$，可带入y=0或1进行检验，发现该式子正确</li>
+<li>假设有一个容量为 m 的数据集（假设符合独立同分布），根据最大似然原理，我们要使得我们的假设的 $\hat y$ 最正确，最符合实际，那么必须满足使得“用 $\hat y$ 估计到的目前整个数据集的概率”<strong>最大</strong>（之所以越大越接近实际，是因为这些数据集已经存在，发生的概率便是 1），那么根据独立事件概率相乘原理：</li>
+<li>“用 $\hat y$ 估计到的目前整个数据集的概率”为 $L(\hat y)=P(y^{(1)}|x^{(1)})P(y^{(2)}|x^{(2)})…P(y^{(m)}|x^{(m)})\\\quad\quad =\prod\limits_{i=1}^m P(y^{(i)}|x^{(i)})\\ \quad\quad =\prod\limits_{i=1}^m    {({\hat y^{(i)}})}   ^{y^{(i)}}          (   1   -    {\hat y^{(i)}}  )^{1-   y^{(i)}} $</li>
+<li>为了让 $L(\hat y)$ <strong>最大</strong>，由于是连乘，我们让 $logL(\hat y)$ 最大，则 $logL(\hat y) = \sum\limits ^m_{i=1} y^{(i)}log{\hat y}^{(i)}+(1-y^{(i)})log(1-{\hat y}^{(i)})$</li>
+<li>而代价函数必须要<strong>尽量小</strong>，所以我们将 $logL(\hat y)$ 取负号，即 $-\sum\limits ^m_{i=1} y^{(i)}log{\hat y}^{(i)}+(1-y^{(i)})log(1-{\hat y}^{(i)})$</li>
+<li>为了让代价函数处于更好的尺度上，我们加上系数 1/m，即 $J(w,b)=-\frac{1}{m}\sum\limits ^m_{i=1} y^{(i)}log{\hat y}^{(i)}+(1-y^{(i)})log(1-{\hat y}^{(i)})$</li>
+<li>代价函数的逻辑为：某个 w，b 算出的代价函数越小 → $L(\hat y)$ 越大 → 用其估计到的目前整个数据集的概率就越大 → 用 w，b 为参数的模型的估计距离实际情况就越接近 → 该模型就越准确</li>
+</ul>
+<h2 id="用梯度下降法训练参数-w-和-b"><a href="#用梯度下降法训练参数-w-和-b" class="headerlink" title="用梯度下降法训练参数 w 和 b"></a>用梯度下降法训练参数 w 和 b</h2><h3 id="概括-1"><a href="#概括-1" class="headerlink" title="概括"></a>概括</h3><p>已知：</p>
+<ul>
+<li><p>模型 $\hat{y} =\sigma( w^Tx + b)$，其中 $\sigma(z)=\frac{1}{1+e^{-z}}$</p>
+</li>
+<li><p>代价函数</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.12.png" alt=""></p>
+</li>
+</ul>
+<p>期望：</p>
+<ul>
+<li><p>找到使 $J(w,b)$ 最小的 w 和 b，如图中红点所示，找到谷底的 w 和 b 值</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.13.png" alt=""></p>
+</li>
+</ul>
+<h3 id="梯度下降法原理"><a href="#梯度下降法原理" class="headerlink" title="梯度下降法原理"></a>梯度下降法原理</h3><ul>
+<li>用一些初始 w，b 值来初始化，通常用 0</li>
+<li>朝着最陡的的下坡方向走一步，第一次迭代</li>
+<li>第二次迭代</li>
+<li>…</li>
+<li>第 n 次迭代到达或接近全局最优点</li>
+</ul>
+<h3 id="单变量梯度下降法（先忽略b）"><a href="#单变量梯度下降法（先忽略b）" class="headerlink" title="单变量梯度下降法（先忽略b）"></a>单变量梯度下降法（先忽略b）</h3><p>  <img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.14.png" alt=""></p>
+<p>  假设 J(w) 曲线如图中所示，为了找到谷底的 w 点，我们重复以下更新操作：</p>
+<script type="math/tex; mode=display">
+  w := w - \alpha\frac{dJ(w)}{dw}</script><p>  其中：</p>
+<ul>
+<li>w <strong>: =</strong> 符号表示对 w 进行迭代更新</li>
+<li>$\alpha$ 为<strong>学习率</strong>，控制每一次迭代的步长大小</li>
+<li>在代码中导数 $\frac{dJ(w)}{dw}$ 的变量名写成 $dw$</li>
+</ul>
+<h3 id="多变量梯度下降法（w，b）"><a href="#多变量梯度下降法（w，b）" class="headerlink" title="多变量梯度下降法（w，b）"></a>多变量梯度下降法（w，b）</h3><script type="math/tex; mode=display">
+  J(w,b)</script><script type="math/tex; mode=display">
+  w := w - \alpha\frac{\partial J(w,b) }{\partial w}</script><script type="math/tex; mode=display">
+  b := b - \alpha\frac{\partial J(w,b) }{\partial b}</script><h2 id="求代价函数的导数"><a href="#求代价函数的导数" class="headerlink" title="求代价函数的导数"></a>求代价函数的导数</h2><h3 id="求损失函数的导数"><a href="#求损失函数的导数" class="headerlink" title="求损失函数的导数"></a>求损失函数的导数</h3><p>  已知公式：</p>
+<p>  <img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.15.png" alt=""></p>
+<p>  假设训练实例有两个特征 : $x_1,x_2$，则逻辑关系如下：</p>
+<p>  <img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.16.png" alt=""></p>
+<p>  根据链式法则求偏导数，推导过程如下：</p>
+<p>  <img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.17.png" alt=""></p>
+<p>  整理可得：</p>
+<script type="math/tex; mode=display">
+“da”=\frac{dL}{da}= \frac {\partial L(a,y)}{\partial a}=-\frac{y}{a}+\frac{1-y}{1-a}</script><script type="math/tex; mode=display">
+“dz”= \frac {dL}{dz}=\frac{dL}{da}\frac{da}{dz}=a-y</script><script type="math/tex; mode=display">
+“dw_1”=\frac{\partial L}{\partial w_1}=x_1dz</script><script type="math/tex; mode=display">
+“dw_2”=\frac{\partial L}{\partial w_2}=x_2dz</script><script type="math/tex; mode=display">
+“db” = \frac{\partial L}{\partial b} = dz</script><blockquote>
+<p>其中：$“da””dz””dw_1””dw_2””db”$ 表示损失函数对其导数在 python 中的变量名，这个过程叫做 <strong>反向传播 (back propagation)</strong></p>
+</blockquote>
+<h3 id="求代价函数的导数-1"><a href="#求代价函数的导数-1" class="headerlink" title="求代价函数的导数"></a>求代价函数的导数</h3><p>由于代价函数是所有训练样本损失函数的平均值，故我们可以用如下的伪代码求得 $dw_1,dw_2,db$ (我们仍然假设只有两个特征值)：</p>
+<p>  首先初始化 $J=0;dw_1=0;dw_2=0;db=0$</p>
+<p>  遍历整个训练集：</p>
+<p>  For i = 1 to m:</p>
+<p>​         $z^{(i)}=w^Tx^{(i)}+b\\a^{(i)}=\sigma(z^{(i)})\\J+=-[y^{(i)}loga^{(i)}+(1-y^{(i)})log(1-a^{(i)})]\\dz^{(i)}=a^{(i)}-y^{(i)}\\dw_1+=x_1^{(i)}dz^{(i)}\\dw_2+=x_2^{(i)}dz^{(i)}\\dw_3…\\dw_4… \\ …\\db+=dz^{(i)}$</p>
+<p>  最后除以训练集个数：</p>
+<p>​         $J=J/m\\”dw_1”=\frac {\partial J}{\partial w_1}=dw_1/m\\”dw_2”=\frac {\partial J}{\partial w_2}=dw_2/m \\ … \\”db”=\frac {\partial J}{\partial b}=db/m$</p>
+<blockquote>
+<p>我们可以看到为了求取代价函数的导数，我们需要进行两次遍历，这是一种十分低效的遍历方式，我们可以使用<strong>向量化（Vectorization）</strong>的方式加速我们的运算</p>
+</blockquote>
+<p>  最后用求得的代价函数的导数更新我们的参数：</p>
+<p>​        $w_1:=w_1-\alpha dw_1\\w_2:=w_2-\alpha dw_1 \\ …\\b:=b-\alpha db$</p>
+<h2 id="向量化（Vectorization）"><a href="#向量化（Vectorization）" class="headerlink" title="向量化（Vectorization）"></a>向量化（Vectorization）</h2><h3 id="什么是向量化"><a href="#什么是向量化" class="headerlink" title="什么是向量化"></a>什么是向量化</h3><ul>
+<li>是一门让代码变得高效的艺术</li>
+<li><p>遍历是<strong>非向量化</strong>，而向量化充分利用 CPU 和 GPU 的并行化实现更快的运算</p>
+<blockquote>
+<p>大概是指直接让两个向量或者矩阵进行点乘</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="向量化的好处"><a href="#向量化的好处" class="headerlink" title="向量化的好处"></a>向量化的好处</h3><ul>
+<li>比非向量化计算效率快很多很多，下面的测试显示快 300 多倍</li>
+<li><p>只要可能，尽量避免使用显式的 for 循环</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.18.png" alt=""></p>
+</li>
+</ul>
+<h3 id="一些向量化的例子"><a href="#一些向量化的例子" class="headerlink" title="一些向量化的例子"></a>一些向量化的例子</h3><ol>
+<li><p>计算  $u = A_{i \times j}V_{j \times 1}$ </p>
+<p>(1) 非向量化：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">u = np.zero((n,1))</span><br><span class="line">for i ...</span><br><span class="line">    for j ...</span><br><span class="line">    	u[i] += A[i][j]*v[j]</span><br></pre></td></tr></table></figure>
+<p>(2) 向量化：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">u = np.dot(A,V)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>计算某个向量所有元素的指数</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.19.png" alt=""></p>
+<p>(1) 非向量化</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">u = np.zeros((n,1))</span><br><span class="line">for i in range(n)</span><br><span class="line">	u[i] = math.exp(V[i])</span><br></pre></td></tr></table></figure>
+<p>(2) 向量化</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">u = np.exp(V)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>其他例子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">np.log(V)</span><br><span class="line">np.abs(V)</span><br><span class="line">np.maximum(V)</span><br><span class="line">V**<span class="number">2</span></span><br><span class="line"><span class="number">1</span>/V</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="用向量化实现逻辑回归"><a href="#用向量化实现逻辑回归" class="headerlink" title="用向量化实现逻辑回归"></a>用向量化实现逻辑回归</h2><h3 id="用-for-循环实现"><a href="#用-for-循环实现" class="headerlink" title="用 for 循环实现"></a>用 for 循环实现</h3><p>  <img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.20.png" alt=""></p>
+<h3 id="向量化实现"><a href="#向量化实现" class="headerlink" title="向量化实现"></a>向量化实现</h3><ol>
+<li><p>前向传播</p>
+<p><strong>求取 Z</strong>：</p>
+<p>$Z=[z^{(1)}\quad z^{(1)}\quad…\quad z^{(m)}]\\=[w^Tx^{(1)}+b\quad w^Tx^{(2)}+b\quad …\quad w^Tx^{(m)}+b] \\=w^T[x^{(1)}\quad x^{(1)}\quad …\quad x^{(m)}]+[b\quad b\quad…\quad b]\\=w^TX+[b\quad b\quad…\quad b]$</p>
+<p>实现代码为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Z = np.dot(w.T,X) + b</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>此处 b 为一个实数，但是 numpy 会自动将这个实数 b 拓展为一个 1 乘 m 的行向量，这个在 python 中称为 <strong>广播（broadcasting）</strong></p>
+</blockquote>
+<p><strong>求取 A</strong>：</p>
+<p>$A=[a^{(1)}  \  a^{(2)} \ … \ a{(m)}]= \sigma(Z)$</p>
+</li>
+<li><p>反向传播</p>
+<p><strong>求取 dZ</strong>：</p>
+<p>$dZ=[dz^{(1)} \ dz^{(2)} \ … \ dz^{(m)}]\\=[a^{(1)}-y^{(1)} \quad a^{(1)}-y^{(1)} \ … \quad a^{(m)}-y^{(m)}]\\=A -Y $</p>
+<p>其中 $Y=[y^{(1)}\quad y^{(2)}\quad … \quad y^{(m)}]$</p>
+<p><strong>求取 dw</strong>：</p>
+<p>$dw=\frac {1}{m}[x^{(1)} dz^{(1)} + x^{(2)} dz^{(2)} +…+x^{(m)} dz^{(m)}]\\=\frac {1}{m}[x^{(1)}\quad x^{(2)}\quad…\quad x^{(m)}][dz^{(1)}\quad dz^{(2)}\quad…\quad dz^{(m)}]^T\\=\frac {1}{m}X(dZ)^T$</p>
+<p><strong>求取 db</strong>：</p>
+<p>$db=\frac {1}{m} \sum\limits _{i=1}^{m} dz^{(i)}=\frac {1}{m}$ np.sum(dZ)</p>
+</li>
+</ol>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>$Z = w^TX + b = np.dot(w.T, X)+b\\A = \sigma (Z)\\dZ=A-Y\\db=\frac {1}{m}np.sum(dZ)\\dw= \frac{1}{m}X(dZ)^T=\frac{1}{m}np.dot(X, dZ.T)\\w:=w-\alpha dw\\b:=b-\alpha db$</p>
+<h2 id="Python中的广播（broadcasting）"><a href="#Python中的广播（broadcasting）" class="headerlink" title="Python中的广播（broadcasting）"></a>Python中的广播（broadcasting）</h2><ul>
+<li>若拿一个<strong>（m，n）</strong>的矩阵加减乘除另一个<strong>（1，n）</strong>的向量，这个向量会复制多次自动拓展成一个<strong>（m，n）</strong>的矩阵然后逐元素进行运算</li>
+<li>若拿一个<strong>（m，1）</strong>的向量加减乘除另一个<strong>实数R</strong>，这个实数会复制多次自动拓展成一个<strong>（m，1）</strong>的向量然后逐元素进行运算</li>
+<li>更多广播功能见 numpy 相关文档</li>
+</ul>
+<h2 id="在使用-numpy-时的注意事项"><a href="#在使用-numpy-时的注意事项" class="headerlink" title="在使用 numpy 时的注意事项"></a>在使用 numpy 时的注意事项</h2><h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><ol>
+<li><p>错误的</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;<span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">&gt;&gt;a = np.random.randn(<span class="number">5</span>)<span class="comment">#产生5个高斯随机变量并存在数组里</span></span><br><span class="line">&gt;&gt;print(a)</span><br><span class="line">[<span class="number">1.37838388</span>  <span class="number">0.53281963</span> <span class="number">-0.41769013</span>  <span class="number">0.69356822</span> <span class="number">-0.30333514</span>]</span><br><span class="line">&gt;&gt;print(a.shape)<span class="comment">#输出 a 的形状</span></span><br><span class="line">(<span class="number">5</span>,)</span><br><span class="line">&gt;&gt;print(a.T)<span class="comment">#输出 a 的转置</span></span><br><span class="line">[<span class="number">1.37838388</span>  <span class="number">0.53281963</span> <span class="number">-0.41769013</span>  <span class="number">0.69356822</span> <span class="number">-0.30333514</span>]</span><br><span class="line">&gt;&gt;print(np.dot(a,a.T))<span class="comment">#输出a 和 a 的转置的点乘</span></span><br><span class="line"><span class="number">8.65042528221</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>正确的</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;a = np.random.randn(<span class="number">5</span>,<span class="number">1</span>)</span><br><span class="line">&gt;&gt;print(a)</span><br><span class="line">[[<span class="number">-0.4593413</span> ]</span><br><span class="line"> [<span class="number">-0.54494632</span>]</span><br><span class="line"> [<span class="number">-0.9348879</span> ]</span><br><span class="line"> [<span class="number">-0.51491905</span>]</span><br><span class="line"> [ <span class="number">0.91934378</span>]]</span><br><span class="line">&gt;&gt;print(a.T)</span><br><span class="line">[[<span class="number">-0.4593413</span>  <span class="number">-0.54494632</span> <span class="number">-0.9348879</span>  <span class="number">-0.51491905</span>  <span class="number">0.91934378</span>]]</span><br><span class="line">&gt;&gt;print(np.dot(a,a.T))</span><br><span class="line">[[ <span class="number">0.21099443</span>  <span class="number">0.25031635</span>  <span class="number">0.42943262</span>  <span class="number">0.23652358</span> <span class="number">-0.42229257</span>]</span><br><span class="line"> [ <span class="number">0.25031635</span>  <span class="number">0.29696649</span>  <span class="number">0.50946372</span>  <span class="number">0.28060324</span> <span class="number">-0.50099301</span>]</span><br><span class="line"> [ <span class="number">0.42943262</span>  <span class="number">0.50946372</span>  <span class="number">0.87401539</span>  <span class="number">0.48139159</span> <span class="number">-0.85948338</span>]</span><br><span class="line"> [ <span class="number">0.23652358</span>  <span class="number">0.28060324</span>  <span class="number">0.48139159</span>  <span class="number">0.26514163</span> <span class="number">-0.47338763</span>]</span><br><span class="line"> [<span class="number">-0.42229257</span> <span class="number">-0.50099301</span> <span class="number">-0.85948338</span> <span class="number">-0.47338763</span>  <span class="number">0.84519299</span>]]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>错误的例子在于 <code>a = np.random.randn(5)</code> 生成了一个形状为 <strong>(5,)</strong> 的名为 <strong>“秩为1的数组”</strong> ，而不是一个向量，这种数组转置之后显示完全一样，但是性质与向量不同，所以极易造成许多奇怪的 bug，所以要杜绝秩为1的数组的使用，而是使用 <code>a = np.random.randn(5,1)</code> 或者 <code>a = np.random.randn(1,5)</code> </p>
+</blockquote>
+</li>
+</ol>
+<h3 id="减少错误的技巧"><a href="#减少错误的技巧" class="headerlink" title="减少错误的技巧"></a>减少错误的技巧</h3><ol>
+<li><p>不要使用 <strong>秩为1的数组</strong>，始终使用 （n，1）列向量或者（1，n）的行向量，例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a = np.random.randn(<span class="number">5</span>,<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>经常使用<strong>断言</strong>语句来确保是向量而不是秩为1的数组,例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">assert</span>(a.shape == (<span class="number">5</span>,<span class="number">1</span>))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>经常使用 <strong>reshape 语句</strong> 来确保矩阵和向量是需要的维度，例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a = np.random.randn(<span class="number">5</span>)<span class="comment">#产生了一个秩为1矩阵</span></span><br><span class="line">a = a.reshape((<span class="number">5</span>,<span class="number">1</span>))<span class="comment">#将其变为（5，1）的列向量</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</div></article><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/吴恩达深度学习笔记/">吴恩达深度学习笔记</a><a class="post-meta__tags" href="/tags/AI/">AI</a><a class="post-meta__tags" href="/tags/神经网络/">神经网络</a><a class="post-meta__tags" href="/tags/逻辑回归/">逻辑回归</a></div><div class="post-qr-code"><div class="post-qr-code-item"><img class="post-qr-code__img" src="/img/qr1.png"><div class="post-qr-code__desc">微信捐赠</div></div><div class="post-qr-code-item"><img class="post-qr-code__img" src="/img/qr2.jpg"><div class="post-qr-code__desc">支付宝捐赠</div></div></div><div class="social-share"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/js/social-share.min.js"></script><nav id="pagination"><div class="prev-post pull-left"><a href="/2018/08/09/吴恩达机器学习c1w2编程作业/"><i class="fa fa-chevron-left">  </i><span>coursera 吴恩达深度学习 Specialization 编程作业（course 1 week 2）</span></a></div><div class="next-post pull-right"><a href="/2018/08/04/吴恩达机器学习笔记c1w1/"><span>coursera 吴恩达深度学习 Specialization 笔记（course 1 week 1）—— 深度学习介绍</span><i class="fa fa-chevron-right"></i></a></div></nav><div class="post-adv"><iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=530 height=86 src="//music.163.com/outchain/player?type=2&id=566993785&auto=1&height=66"></iframe></div><div id="lv-container" data-id="city" data-uid="MTAyMC8zODM1Mi8xNDg4MA=="><script>(function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+})(document, 'script');</script></div></div></div><footer><div class="layout" id="footer"><div class="copyright">&copy;2018 By 陈艺琛</div><div class="framework-info"><span>驱动 - </span><a href="http://hexo.io"><span>Hexo</span></a><span class="footer-separator">|</span><span>主题 - </span><a href="https://github.com/Molunerfinn/hexo-theme-melody"><span>Melody</span></a></div><div class="footer_custom_text">这里是我的一亩自耕田，记录自己的学习过程，生活随想和读书笔记，感谢您的参观！</div><div class="busuanzi"><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file-o"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="/js/third-party/anime.min.js"></script><script src="/js/third-party/jquery.min.js"></script><script src="/js/third-party/jquery.fancybox.min.js"></script><script src="/js/third-party/velocity.min.js"></script><script src="/js/third-party/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.5.6"></script><script src="/js/fancybox.js?version=1.5.6"></script><script src="/js/sidebar.js?version=1.5.6"></script><script src="/js/copy.js?version=1.5.6"></script><script src="/js/fireworks.js?version=1.5.6"></script><script src="/js/transition.js?version=1.5.6"></script><script src="/js/scroll.js?version=1.5.6"></script><script src="/js/head.js?version=1.5.6"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  CommonHTML: {
+    linebreaks: { automatic: true, width: "90% container" }
+  },
+  "HTML-CSS": { 
+    linebreaks: { automatic: true, width: "90% container" }
+  },
+  "SVG": { 
+    linebreaks: { automatic: true, width: "90% container" }
+  }
+});
+</script><script type="text/x-mathjax-config">MathJax.Hub.Queue(function() {
+  var all = MathJax.Hub.getAllJax(), i;
+  for (i=0; i < all.length; i += 1) {
+    all[i].SourceElement().parentNode.className += ' has-jax';
+  }
+});
+</script><script src="https://cdn.bootcss.com/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script src="/js/search/local-search.js"></script><div class="search-dialog" id="local-search"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章"></div></div></div><hr><div id="local-search-results"><div id="local-hits"></div><div id="local-stats"><div class="local-search-stats__hr" id="hr"><span>由</span> <a href="https://github.com/wzpan/hexo-generator-search" style="color:#49B1F5;">hexo-generator-search</a>
+ <span>提供支持</span></div></div></div><span class="search-close-button"><i class="fa fa-times"></i></span></div><div class="search-mask"></div></body></html>
