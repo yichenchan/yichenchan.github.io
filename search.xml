@@ -3,6 +3,31 @@
   
     
     <entry>
+      <title>coursera 吴恩达深度学习 Specialization 笔记（course 4 week 3）—— 物体检测</title>
+      <link href="/2018/10/23/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0c4w3/"/>
+      <url>/2018/10/23/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0c4w3/</url>
+      <content type="html"><![CDATA[<p>本周主要学习如何通过 CNN 来进行物体检测。</p><h2 id="物体定位（单个物体）"><a href="#物体定位（单个物体）" class="headerlink" title="物体定位（单个物体）"></a>物体定位（单个物体）</h2><h3 id="什么是物体定位"><a href="#什么是物体定位" class="headerlink" title="什么是物体定位"></a>什么是物体定位</h3><ul><li>图像分类：图片中是否有车</li><li>物体定位：不仅要识别出是否有车（单个对象），还要在车的周围生成一个边框，即分类+定位</li><li>物体检测：找到一张图片里的<strong>多个</strong>对象并定位它们</li></ul><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_1.png" alt=""></p><a id="more"></a><h3 id="如何定位"><a href="#如何定位" class="headerlink" title="如何定位"></a>如何定位</h3><p>假设我们需要找出图片中是否有以下四类对象：</p><ul><li>行人</li><li>车</li><li>摩托车</li><li>无物体</li></ul><p>我们最后用 softmax 输出四个分类，不仅如此，为了找出它们的位置，还需要输出以下四个值：</p><ul><li>$b_x$ ：方框中心的横坐标</li><li>$b_y$：方框中心的纵坐标</li><li>$b_h$：方框的高度</li><li>$b_w$：方框的宽度</li></ul><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_2.png" alt=""></p><p>最后目标标签为：</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_3.png" alt=""></p><ul><li>Pc 指的是图片中存在该单个对象的概率，若有则值为 1，若没有则值为 0</li><li>C1、C2、C3 当物体为某个类时，对应的 C 值取 1，其他取 0</li><li>当 Pc 为 0 时，也就是图片中不存在物体时，剩下的 ？ 值表示我们并不关心这些值是多少</li></ul><h3 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h3><p>假设使用平方误差，那么：</p><script type="math/tex; mode=display">L(\hat y ,y)=\left\{\begin{matrix}(\hat y_1-y_1)^2+(\hat y_2-y_2)^2+...+(\hat y_8-y_8)^2 & if \ \ y_1 =1\\  (\hat y_1-y_1)^2& if \ \ y _1=0\end{matrix}\right.</script><h2 id="特征点检测"><a href="#特征点检测" class="headerlink" title="特征点检测"></a>特征点检测</h2><p>当我们需要找出图片中的一些特征点时，我们可以在标签中增加这些点的坐标。</p><p>例如我们需要识别出下面这张脸的五官的轮廓，我们可以定义一些特征点，产生含有这些特征点坐标的训练集，然后我们将图片丢进神经网络，最后输出若干个值。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_4.png" alt=""></p><h2 id="物体检测（多个物体）"><a href="#物体检测（多个物体）" class="headerlink" title="物体检测（多个物体）"></a>物体检测（多个物体）</h2><h3 id="滑动窗口检测法-Sliding-Windows"><a href="#滑动窗口检测法-Sliding-Windows" class="headerlink" title="滑动窗口检测法 Sliding Windows"></a>滑动窗口检测法 Sliding Windows</h3><p>拍一张照片然后裁剪掉其他不是汽车的部分，得到一张汽车剧中并几乎占全部画面的紧密裁剪的汽车图像，使用许多紧密裁剪的汽车图像作为训练集，训练一个神经网络判断是车。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_5.png" alt=""></p><p>在一张可能包含汽车的大图像中，先选择一个窗口尺寸，然后只读取这个小窗口内的图像，输入到上面训练的卷积网络中，做一个预测，滑动窗口检测指的是将小窗口按步长移动到下一个位置，再重复上述操作，再移动窗口，重复上述操作，直到滑动窗口遍历了图像中的所有位置。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_6.png" alt=""></p><p>然后我们可以取不同大小的窗口重复上述操作，只要图像某处中有一辆车，那么就会有某个窗口会圈住一辆车然后检测出来。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_7.png" alt=""></p><p>缺点：</p><ul><li>当你使用较大的窗口移动步长，算法表现会下降</li><li>当你使用较小的步长，计算成本则会非常高</li></ul><h3 id="滑动窗口检测的卷积实现"><a href="#滑动窗口检测的卷积实现" class="headerlink" title="滑动窗口检测的卷积实现"></a>滑动窗口检测的卷积实现</h3><p>如果每个小窗口的图像都通过这么一个卷积网络：</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_8.png" alt=""></p><p>我们将全连接层改造成以下的结构，实现参数共享，减少计算量：</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_9.png" alt=""></p><p>具体做法是：</p><p>我们将待检测的大图像直接输入到我们改造后的（本来用来预测窗口图像的）卷积网络中，最后的输出就是我们对应的每个滑动窗口的结果，而不是一个窗口一个窗口滑动，截取图像然后输入。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_10.png" alt=""></p><p>由于直接将整个图像输入到训练好的网络，在同一时间将所有的滑动窗口实现了前向传播，实现了参数的共享，减少了计算的成本。</p><p>缺点：由于窗口只能是正方形，所以边界框的位置不准确。</p><h2 id="边界框预测"><a href="#边界框预测" class="headerlink" title="边界框预测"></a>边界框预测</h2><h3 id="YOLO-算法介绍"><a href="#YOLO-算法介绍" class="headerlink" title="YOLO 算法介绍"></a>YOLO 算法介绍</h3><p>为了更好地检测出物体的真实边界，可以使用 YOLO 算法，是 you only look once 的缩写。</p><p>有一张图片，首先用 9×9 的网络划分（当然实际使用中可以使用更加精细的），然后将开始学到的<strong>物体定位</strong>算法运用在这每一个网格中。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_12.png" alt=""></p><p>那么根据每个网格是否有物体，如果有，那么边界框坐标是多少，是什么类别，得到每个网格的标签值 y 为：</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_13.png" alt=""></p><blockquote><p>值得注意的是，每个物体就算跨越了多个网格，我们也只能将其划分到它<strong>中心点</strong>所在的网格里。</p></blockquote><p>所以最后将这些标签堆叠起来形成一个维度为 3×3×8 的标签（8 指的是每个网格的 8 个标签值）。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_14.png" alt=""></p><p>我们要做的是输入训练集进入一个卷积网络，我们通过调整网络超参数使得最后输出一个 3×3×8 的向量，这就与我们 3×3×8 的标签形成对应，构造代价函数。经过训练之后，我们随便输入一张图像，就可以知道在网格每个位置是否存在物体，对应的边界框坐标是什么。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_15.png" alt=""></p><h3 id="如何确定边界框的参数"><a href="#如何确定边界框的参数" class="headerlink" title="如何确定边界框的参数"></a>如何确定边界框的参数</h3><p>一种方法是令网格的左上角为（0，0），右下角为（1，1），那么中心点的坐标由它相对（0，0）的位置决定，一定介于 0～1 之间；而方框的长跟宽根据它和网格宽度的比例决定，可以超过 1.</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_16.png" alt=""></p><p>例如上面黄色中心点的坐标约为（0.4，0.3，0.9，0.5）。</p><h2 id="如何评价物体检测算法"><a href="#如何评价物体检测算法" class="headerlink" title="如何评价物体检测算法"></a>如何评价物体检测算法</h2><p>为了知道物体检测算法的性能好坏，可以使用一个叫做<strong>“交并比 (Intersection Over Union)”</strong>的函数.</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_18.png" alt=""></p><p>假设红框是实际的边界，紫框是算法预测的边界，黄色部分是两者的交集，绿色部分是两者的并集，那么：</p><p>交并比 IoU = 交集的面积 / 并集的面积。</p><p>判别：一般来说，如果 IoU 大于等于 <strong>0.5</strong>，便可认为定位正确。也可以定义更严格的值。</p><h2 id="抑制非最大值-non-max-suppression"><a href="#抑制非最大值-non-max-suppression" class="headerlink" title="抑制非最大值 non-max suppression"></a>抑制非最大值 non-max suppression</h2><p>如下图所示，一个 19×19 的网格将图片划分，运行 YOLO 算法，可能对于一辆汽车，有许多网格都认为该汽车的中心点在它那里，即这辆汽车的范围内的许多网格都认为自己检测到了汽车了，发生重复检测的问题。抑制非最大值可以确保算法对一个物体只检测一次，而不是检测许多次。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_19.png" alt=""></p><p>如果一辆车检测了许多次，就会在其周围产生许多方框，如下图所示，每个方框上的数字表示该网格认为自己检测到了物体的概率：</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_20.png" alt=""></p><p>抑制非最大值的具体的做法为（假设只是检测单一物体）：</p><ul><li>每个网格的输出为：$\begin{bmatrix}<br>p_c\\<br>b_x\\<br>b_y\\<br>b_h\\<br>b_w\\<br>\end{bmatrix}$ </li><li>丢弃所有低概率网格，例如 $p_c \leqslant 0.6$ （或其他概率）的网格</li><li>在剩下的网格中<ul><li>挑选出具有最大 $p_c$ 值的网格</li><li>丢弃那些与刚刚选出的网格的 IoU 值大于 0.5 的网格</li></ul></li></ul><p>如果检测是多种物体，比如汽车、行人、摩托车，那么正确的做法是：各自独立，进行三次“抑制非最大值”。</p><h2 id="锚框法-anchor-boxes"><a href="#锚框法-anchor-boxes" class="headerlink" title="锚框法 anchor boxes"></a>锚框法 anchor boxes</h2><p>目前看过的物件检测算法，有一个问题是每一个网格只能侦测一个物件，如果一个网格想要侦测多个物体，可以使用“锚框法 anchor boxes”。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_21.png" alt=""></p><p>对于上面这张图，我们发现人和汽车的中心点几乎重叠在一起，在一个格子里，如果输出 $y = \left[ \begin{array} { c } { p _ { c } } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { w } } \\ { b _ { w } } \\ { c _ { 1 } } \\ { c _ { 2 } \\ c_3 } \end{array} \right]$，那么它无法同时输出两个物体的方框，只能二选一，我们可以在这个网格画出两个锚框（也可能更多）框住这两个物体，如下图所示：</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_22.png" alt=""></p><p>然后将输出的标签改为：</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_23.png" alt=""></p><p>用锚框 1 来框住行人，锚框 2 来框住汽车。</p><p>在使用锚框前：训练图片中的每个物体被分给一个包含了它中心点的格子。输出维度 3×3×8。</p><p>使用锚框后：训练图片中的每个物体被分给（1）包含了它中心点的格子（2）这个格子里据有更高 IoU 的锚框。输出维度为 3×3×2×8。</p><p>举个例子：</p><p> 标签值 $y=\left[ \begin{array} { l } { p _ { c } } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { c_ { 1 } } \\ { c _ { 2 } }\\ { c _ { 3 } } \\ { p _ { c } } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { c _ { 1 } } \\ { c _ { 2 } } \\ { c _ { 3 } }  \end{array} \right]$，假如某个网格有两个物体，则为 $ \left[ \begin{array} { l } { 1 } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { 1 } \\ { 0}\\ { 0 } \\ { 1 } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { 0 } \\ { 1 } \\ { 0 }  \end{array} \right] $，如果只有车，则为 $ \left[ \begin{array} { l } { 0 } \\ { ？ } \\ { ？} \\ { ？ } \\ {  ？ } \\ { ？} \\ { ？}\\ { ？ } \\ { 1 } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { 0 } \\ { 1 } \\ { 0 }  \end{array} \right] $  </p><p>实际上，在一个网格处理两个物体的情况很少发生，尤其是当网格为 19×19 时。</p><h2 id="YOLO-物体检测算法"><a href="#YOLO-物体检测算法" class="headerlink" title="YOLO 物体检测算法"></a>YOLO 物体检测算法</h2><p>综合上面所有要素，来组成目前最先进的目标检测算法——YOLO 算法。</p><h3 id="构建训练集并训练"><a href="#构建训练集并训练" class="headerlink" title="构建训练集并训练"></a>构建训练集并训练</h3><ul><li>三个分类类别：行人、汽车、摩托车</li><li>两个锚框</li><li>3×3 的网格划分（实际中一般是 19×19）</li><li>遍历每张图片的 9 个网格，得到标签向量，维度是 3×3×2×8</li></ul><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_24.png" alt=""></p><h3 id="进行预测"><a href="#进行预测" class="headerlink" title="进行预测"></a>进行预测</h3><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_25.png" alt=""></p><h3 id="非最大值抑制"><a href="#非最大值抑制" class="headerlink" title="非最大值抑制"></a>非最大值抑制</h3><ul><li><p>每个网格都会得到两个预测的边界框（因为有两个锚框）</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_26.png" alt=""></p></li><li><p>去掉所有低概率预测</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_27.png" alt=""></p></li><li><p>对于分类的每个类别（行人、汽车、摩托车），单独对每个预测的类别执行非最大值抑制，重复几次，得到最终的预测框</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_28.png" alt=""></p></li></ul>]]></content>
+      
+      <categories>
+          
+          <category> 学习笔记 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 吴恩达深度学习笔记 </tag>
+            
+            <tag> AI </tag>
+            
+            <tag> cnn </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
       <title>coursera 吴恩达深度学习 Specialization 编程作业（course 4 week 2）</title>
       <link href="/2018/10/19/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0c4w2%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A/"/>
       <url>/2018/10/19/%E5%90%B4%E6%81%A9%E8%BE%BE%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0c4w2%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A/</url>
@@ -244,9 +269,32 @@
             
             <tag> AI </tag>
             
+            <tag> 神经网络优化 </tag>
+            
             <tag> 优化算法 </tag>
             
-            <tag> 神经网络优化 </tag>
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>《Beck》观后感</title>
+      <link href="/2018/09/01/beck%E8%A7%82%E5%90%8E%E6%84%9F/"/>
+      <url>/2018/09/01/beck%E8%A7%82%E5%90%8E%E6%84%9F/</url>
+      <content type="html"><![CDATA[<p>　　我终于找到我的本命番了，它的名字叫《Beck》，为啥我知道这是本命番呢，因为这是第一部我看到最后迟迟舍不得看完的番，一共２６集，每天睡前看几集，看了有十几天，不敢一次看完，因为看完了我的梦就碎了，是的，这是一个追梦的故事，我相信任何热爱摇滚，热爱音乐，热爱吉他，渴望或者已经开始玩乐队的人，都会对这部番有着深深的感动和发自内心的共鸣。因为这部番，我拿起了好久没碰的木琴，并开始挑选我的第一把电吉他……</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/beck%E8%A7%82%E5%90%8E%E6%84%9F_topimg.jpg" alt=""></p><a id="more"></a><p>　　我是怎么发现这部如此小众的动漫的呢，是群里一个新加的朋友告诉我的，这个群是我建的摇滚群，只有我一个人（笑），本来准备将群解散，在前段时间突然加进来一个人。我本以为和以前那些加入者一样，只是些悦耳旋律的伪摇滚迷，没想到谈论一番，此人对摇滚很有自己的理解，是我所理解的“硬核摇滚迷”，最让我惊讶的是，此人居然会变听歌边做笔记，我瞬间对他刮目相看。虽然我自己对摇滚乐理解也不深，但是感觉找到了能与之一谈的对摇滚乐有较强鉴赏能力的人。他给我看了他的四张专辑，其中两张都是名为《beck》的专辑，我以为是某个乐队名，结果他告诉我这是一部动漫的名字，并且强烈建议我去看，本来是抱着试试的心态去看，结果发现了自己的本命番哈哈。这人的昵称叫“Lucille”，就是动漫里那把传奇吉他的名字。</p><p>　　这部番是少见的乐队题材动漫，讲的是一个日本少年从只听流行乐的普通少年因为喜欢的女孩爱上摇滚开始弹吉他，加入乐队，最后乐队开始全美巡演的故事。这个少年叫小雄，在接触摇滚之前是你能想象的最普通的少年，偶然的机会碰到自己好久不见的童年伙伴小泉，她是一个喜欢摇滚的女生，有一次和她出去听乐队 live，结束后她和别人激烈地谈论着自己喜欢的乐队的 The dying breed，不听摇滚的小雄完全无法一起谈论，这让他非常低落，后来小泉给了他一张卷子DB的专辑，从此小雄打开了新世界的大门……不得不说，小雄刚开始对摇滚有点爱屋及乌的感觉，也许每个人都会因为迷恋一个人而爱上另一样东西吧。如果说小泉是带小雄进入摇滚世界的启蒙者，那么龙介就是带小雄进入乐队世界的启蒙者，他因为被龙介的狗咬伤而认识龙介，他给了小雄第一把吉他，然后发生了一段微妙而真实的小插曲。刚拿到吉他的小雄，也许是想要装逼，直接拿着吉他而不放进琴箱就上街溜达，结果一个平地摔把吉他摔断了，导致龙介暂时和他绝交，心灰意冷的小雄走在街上，好心的斋藤先生路过，决定帮他修吉他，代价是在他店里打工，没想到斋藤先生是个老摇滚迷，所以带小雄学吉他，又成了小雄吉他的启蒙者。小雄刚学吉他想要让全世界知道的心理，学几下就嫌手指疼放弃的描写，种种细节，对我们这些玩吉他的人来说真的是再亲切不过了，关于情节，实在非常的有趣且跌宕起伏，真想一口气把它们都详细地叙述出来！可惜篇幅有限，只能靠你们自己去看啦。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/beck%E8%A7%82%E5%90%8E%E6%84%9F_3.png" alt="乐队成员"></p><p>　　这部动漫对人物的塑造和对乐队的描绘真的是入木三分。懦弱敏感而胆小的小雄，面对霸凌任由欺负，却在最后敢于面对上万的观众单独上台，乐队的主心骨主音吉他手龙介经常一副冷漠脸，可他的心里却隐藏着比谁都大的野心和热情，低调的眯眯眼鼓手阿樱（眯眯眼都是怪物hhh），贝斯技术高超而稳重的贝斯手阿平以及集正直、幽默、直率、满腔热血于一体的极富感染力的主唱千叶。龙介把这么一群人组合到一起，用他的狗的名字成立一个乐队——beck。这部动漫还有一个我印象很深的人物是斋藤先生，他四十多岁还没有结婚，独自生活经营着一家快要倒闭的纸店，他好色、猥琐、自私但是善良且忠厚，就是这个一个猥琐穷困的中年男人，居然是一个被摇滚拯救人生的摇滚老炮，家里收藏了几把吉他，虽然每天在外面跑业务低声下气，但是只要一有空，就进入摇滚的世界开始享受，他有一只鸟，只对好听的音乐欢呼，斋藤先生的梦想就是有一天能让它欢呼。我真的被这个角色感动到了，因为从他身上，我看到了一种可能性，在生活的重压下就算是一个四十岁的中年人都能享受摇滚的可能性，希望自己像他一样，不管到多老，都能享受摇滚，享受音乐。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/beck%E8%A7%82%E5%90%8E%E6%84%9F_2.png" alt="斋藤先生"></p><p>　　这部动漫另一个有趣之处在于，虽然里面所有乐队和人都是虚构的，但是致敬了许多经典的摇滚乐队，比如刚开始提到最多的乐队The dying breed，我感觉对应现实中就是 nirvana，因为DB的吉他手艾迪的形象跟科本真的是太像了，金色长发，传奇吉他手，另外还有斋藤先生最爱的乐队rocket boy，风格完全和披头士一模一样，另外里面还经常提到滚石，齐柏林飞艇，地下丝绒等许多乐队，还有衬衫上专辑上都能看到许多经典乐队的影子，详细的可以见知乎有些大神的分析，这些细节对于摇滚迷来说真的不能再亲切了。</p><p>　　既然是音乐番，那么怎么能少的了音乐。这部番的音乐制作非常精良，我最喜欢的是小雄妙手偶得的那首《spit out》，不仅打动了动漫里音乐节的一万多人，更打动了屏幕外的我，但是最让人印象深刻的应该是剧里DB的《moon on the water》，这首歌见证了小雄的成长，刚开始觉得这首歌不好听，但是随着剧情深入，越听越有味道，尤其是月色下小雄和真帆在游泳池里的场景，让人无法忘怀，引用网易云一句评论：“真帆在泳池唱这首歌，月光皎洁，风吹过草地，水面泛起波纹，那一瞬间真的恍若天籁，又真实简单的让人动容。”到 youtube 上一查，果然许多人在翻唱这首歌，看完这部番的那天，我把这首歌听了一整天，然后花了一天学会弹，唱着歌词，满脑子都是真帆的样子。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/beck%E8%A7%82%E5%90%8E%E6%84%9F_4.jpg" alt="moon on the water"></p><p>　　之所以迟迟不舍得看完，是因为这部动漫构建了一个梦，构建了一个普通少年的摇滚梦，它细腻的描写和真实的情感，给这个梦添上了翔实的细节，看完了，美好的梦就没了。不得不说，小雄是我所希望成为的那一种人，小雄的人生是我想过的人生，有摇滚，有朋友，有吉他，有乐队，但对我来说这些只是一个飘渺的幻影，因为我并不知道我该怎么样获得这种生活，而这部动漫给我描述另一个和我一样普通的少年如何走上这条路的过程，我将自己，也许每个热爱摇滚的青年都会这么做，带入小雄这个角色，为乐队的繁荣而开心，为乐队的解散而难受，所以这部番才能带给我如此多的感动。乐队，一个如此遥远而熟悉的名词啊，总有一天，我要像小雄一样，组一个最强的乐队！</p><p>　　不知不觉写了好多，但是我觉得我拙劣的文笔还是无法表达出我对这部作品有多喜爱。吉他在考研之后好久没碰，看完这部番，我又重新拿起了吉他，开始重新出发，谢谢你 beck，我又找回了我最初的梦。也许我不能像小雄一样碰到龙介，但是我希望成为自己的龙介。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/beck%E8%A7%82%E5%90%8E%E6%84%9F_5.png" alt="谢谢你小雄"></p>]]></content>
+      
+      <categories>
+          
+          <category> 读书观影笔记 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 摇滚 </tag>
+            
+            <tag> 音乐 </tag>
             
         </tags>
       
@@ -276,29 +324,6 @@
             <tag> 正则化 </tag>
             
             <tag> 初始化 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    <entry>
-      <title>《Beck》观后感</title>
-      <link href="/2018/09/01/beck%E8%A7%82%E5%90%8E%E6%84%9F/"/>
-      <url>/2018/09/01/beck%E8%A7%82%E5%90%8E%E6%84%9F/</url>
-      <content type="html"><![CDATA[<p>　　我终于找到我的本命番了，它的名字叫《Beck》，为啥我知道这是本命番呢，因为这是第一部我看到最后迟迟舍不得看完的番，一共２６集，每天睡前看几集，看了有十几天，不敢一次看完，因为看完了我的梦就碎了，是的，这是一个追梦的故事，我相信任何热爱摇滚，热爱音乐，热爱吉他，渴望或者已经开始玩乐队的人，都会对这部番有着深深的感动和发自内心的共鸣。因为这部番，我拿起了好久没碰的木琴，并开始挑选我的第一把电吉他……</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/beck%E8%A7%82%E5%90%8E%E6%84%9F_topimg.jpg" alt=""></p><a id="more"></a><p>　　我是怎么发现这部如此小众的动漫的呢，是群里一个新加的朋友告诉我的，这个群是我建的摇滚群，只有我一个人（笑），本来准备将群解散，在前段时间突然加进来一个人。我本以为和以前那些加入者一样，只是些悦耳旋律的伪摇滚迷，没想到谈论一番，此人对摇滚很有自己的理解，是我所理解的“硬核摇滚迷”，最让我惊讶的是，此人居然会变听歌边做笔记，我瞬间对他刮目相看。虽然我自己对摇滚乐理解也不深，但是感觉找到了能与之一谈的对摇滚乐有较强鉴赏能力的人。他给我看了他的四张专辑，其中两张都是名为《beck》的专辑，我以为是某个乐队名，结果他告诉我这是一部动漫的名字，并且强烈建议我去看，本来是抱着试试的心态去看，结果发现了自己的本命番哈哈。这人的昵称叫“Lucille”，就是动漫里那把传奇吉他的名字。</p><p>　　这部番是少见的乐队题材动漫，讲的是一个日本少年从只听流行乐的普通少年因为喜欢的女孩爱上摇滚开始弹吉他，加入乐队，最后乐队开始全美巡演的故事。这个少年叫小雄，在接触摇滚之前是你能想象的最普通的少年，偶然的机会碰到自己好久不见的童年伙伴小泉，她是一个喜欢摇滚的女生，有一次和她出去听乐队 live，结束后她和别人激烈地谈论着自己喜欢的乐队的 The dying breed，不听摇滚的小雄完全无法一起谈论，这让他非常低落，后来小泉给了他一张卷子DB的专辑，从此小雄打开了新世界的大门……不得不说，小雄刚开始对摇滚有点爱屋及乌的感觉，也许每个人都会因为迷恋一个人而爱上另一样东西吧。如果说小泉是带小雄进入摇滚世界的启蒙者，那么龙介就是带小雄进入乐队世界的启蒙者，他因为被龙介的狗咬伤而认识龙介，他给了小雄第一把吉他，然后发生了一段微妙而真实的小插曲。刚拿到吉他的小雄，也许是想要装逼，直接拿着吉他而不放进琴箱就上街溜达，结果一个平地摔把吉他摔断了，导致龙介暂时和他绝交，心灰意冷的小雄走在街上，好心的斋藤先生路过，决定帮他修吉他，代价是在他店里打工，没想到斋藤先生是个老摇滚迷，所以带小雄学吉他，又成了小雄吉他的启蒙者。小雄刚学吉他想要让全世界知道的心理，学几下就嫌手指疼放弃的描写，种种细节，对我们这些玩吉他的人来说真的是再亲切不过了，关于情节，实在非常的有趣且跌宕起伏，真想一口气把它们都详细地叙述出来！可惜篇幅有限，只能靠你们自己去看啦。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/beck%E8%A7%82%E5%90%8E%E6%84%9F_3.png" alt="乐队成员"></p><p>　　这部动漫对人物的塑造和对乐队的描绘真的是入木三分。懦弱敏感而胆小的小雄，面对霸凌任由欺负，却在最后敢于面对上万的观众单独上台，乐队的主心骨主音吉他手龙介经常一副冷漠脸，可他的心里却隐藏着比谁都大的野心和热情，低调的眯眯眼鼓手阿樱（眯眯眼都是怪物hhh），贝斯技术高超而稳重的贝斯手阿平以及集正直、幽默、直率、满腔热血于一体的极富感染力的主唱千叶。龙介把这么一群人组合到一起，用他的狗的名字成立一个乐队——beck。这部动漫还有一个我印象很深的人物是斋藤先生，他四十多岁还没有结婚，独自生活经营着一家快要倒闭的纸店，他好色、猥琐、自私但是善良且忠厚，就是这个一个猥琐穷困的中年男人，居然是一个被摇滚拯救人生的摇滚老炮，家里收藏了几把吉他，虽然每天在外面跑业务低声下气，但是只要一有空，就进入摇滚的世界开始享受，他有一只鸟，只对好听的音乐欢呼，斋藤先生的梦想就是有一天能让它欢呼。我真的被这个角色感动到了，因为从他身上，我看到了一种可能性，在生活的重压下就算是一个四十岁的中年人都能享受摇滚的可能性，希望自己像他一样，不管到多老，都能享受摇滚，享受音乐。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/beck%E8%A7%82%E5%90%8E%E6%84%9F_2.png" alt="斋藤先生"></p><p>　　这部动漫另一个有趣之处在于，虽然里面所有乐队和人都是虚构的，但是致敬了许多经典的摇滚乐队，比如刚开始提到最多的乐队The dying breed，我感觉对应现实中就是 nirvana，因为DB的吉他手艾迪的形象跟科本真的是太像了，金色长发，传奇吉他手，另外还有斋藤先生最爱的乐队rocket boy，风格完全和披头士一模一样，另外里面还经常提到滚石，齐柏林飞艇，地下丝绒等许多乐队，还有衬衫上专辑上都能看到许多经典乐队的影子，详细的可以见知乎有些大神的分析，这些细节对于摇滚迷来说真的不能再亲切了。</p><p>　　既然是音乐番，那么怎么能少的了音乐。这部番的音乐制作非常精良，我最喜欢的是小雄妙手偶得的那首《spit out》，不仅打动了动漫里音乐节的一万多人，更打动了屏幕外的我，但是最让人印象深刻的应该是剧里DB的《moon on the water》，这首歌见证了小雄的成长，刚开始觉得这首歌不好听，但是随着剧情深入，越听越有味道，尤其是月色下小雄和真帆在游泳池里的场景，让人无法忘怀，引用网易云一句评论：“真帆在泳池唱这首歌，月光皎洁，风吹过草地，水面泛起波纹，那一瞬间真的恍若天籁，又真实简单的让人动容。”到 youtube 上一查，果然许多人在翻唱这首歌，看完这部番的那天，我把这首歌听了一整天，然后花了一天学会弹，唱着歌词，满脑子都是真帆的样子。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/beck%E8%A7%82%E5%90%8E%E6%84%9F_4.jpg" alt="moon on the water"></p><p>　　之所以迟迟不舍得看完，是因为这部动漫构建了一个梦，构建了一个普通少年的摇滚梦，它细腻的描写和真实的情感，给这个梦添上了翔实的细节，看完了，美好的梦就没了。不得不说，小雄是我所希望成为的那一种人，小雄的人生是我想过的人生，有摇滚，有朋友，有吉他，有乐队，但对我来说这些只是一个飘渺的幻影，因为我并不知道我该怎么样获得这种生活，而这部动漫给我描述另一个和我一样普通的少年如何走上这条路的过程，我将自己，也许每个热爱摇滚的青年都会这么做，带入小雄这个角色，为乐队的繁荣而开心，为乐队的解散而难受，所以这部番才能带给我如此多的感动。乐队，一个如此遥远而熟悉的名词啊，总有一天，我要像小雄一样，组一个最强的乐队！</p><p>　　不知不觉写了好多，但是我觉得我拙劣的文笔还是无法表达出我对这部作品有多喜爱。吉他在考研之后好久没碰，看完这部番，我又重新拿起了吉他，开始重新出发，谢谢你 beck，我又找回了我最初的梦。也许我不能像小雄一样碰到龙介，但是我希望成为自己的龙介。</p><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/beck%E8%A7%82%E5%90%8E%E6%84%9F_5.png" alt="谢谢你小雄"></p>]]></content>
-      
-      <categories>
-          
-          <category> 读书观影笔记 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 摇滚 </tag>
-            
-            <tag> 音乐 </tag>
             
         </tags>
       

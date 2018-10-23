@@ -1,0 +1,171 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="coursera 吴恩达深度学习 Specialization 笔记（course 4 week 3）—— 物体检测"><meta name="keywords" content="吴恩达深度学习笔记,AI,cnn"><meta name="author" content="陈艺琛,undefined"><meta name="copyright" content="陈艺琛"><title>coursera 吴恩达深度学习 Specialization 笔记（course 4 week 3）—— 物体检测 | 艺琛的 Livehouse</title><link rel="shortcut icon" href="/img/logo1.png"><link rel="stylesheet" href="/css/index.css?version=1.5.6"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css?version=1.5.6"><link rel="dns-prefetch" href="https://cdn.staticfile.org"><link rel="dns-prefetch" href="https://cdn.bootcss.com"><link rel="dns-prefetch" href="https://creativecommons.org"><link rel="dns-prefetch" href="https://hm.baidu.com"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?20c8efd323cd63b9f6bf846113eb6f60";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();</script><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容:${query}"}},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  }
+} </script></head><body><canvas class="fireworks"></canvas><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar"><div class="toggle-sidebar-info text-center"><span data-toggle="切换文章详情">切换站点概览</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#物体定位（单个物体）"><span class="toc-number">1.</span> <span class="toc-text">物体定位（单个物体）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是物体定位"><span class="toc-number">1.1.</span> <span class="toc-text">什么是物体定位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何定位"><span class="toc-number">1.2.</span> <span class="toc-text">如何定位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#损失函数"><span class="toc-number">1.3.</span> <span class="toc-text">损失函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#特征点检测"><span class="toc-number">2.</span> <span class="toc-text">特征点检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#物体检测（多个物体）"><span class="toc-number">3.</span> <span class="toc-text">物体检测（多个物体）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#滑动窗口检测法-Sliding-Windows"><span class="toc-number">3.1.</span> <span class="toc-text">滑动窗口检测法 Sliding Windows</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#滑动窗口检测的卷积实现"><span class="toc-number">3.2.</span> <span class="toc-text">滑动窗口检测的卷积实现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#边界框预测"><span class="toc-number">4.</span> <span class="toc-text">边界框预测</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#YOLO-算法介绍"><span class="toc-number">4.1.</span> <span class="toc-text">YOLO 算法介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何确定边界框的参数"><span class="toc-number">4.2.</span> <span class="toc-text">如何确定边界框的参数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何评价物体检测算法"><span class="toc-number">5.</span> <span class="toc-text">如何评价物体检测算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#抑制非最大值-non-max-suppression"><span class="toc-number">6.</span> <span class="toc-text">抑制非最大值 non-max suppression</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#锚框法-anchor-boxes"><span class="toc-number">7.</span> <span class="toc-text">锚框法 anchor boxes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#YOLO-物体检测算法"><span class="toc-number">8.</span> <span class="toc-text">YOLO 物体检测算法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#构建训练集并训练"><span class="toc-number">8.1.</span> <span class="toc-text">构建训练集并训练</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#进行预测"><span class="toc-number">8.2.</span> <span class="toc-text">进行预测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#非最大值抑制"><span class="toc-number">8.3.</span> <span class="toc-text">非最大值抑制</span></a></li></ol></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/avater.jpg"></div><div class="author-info__name text-center">陈艺琛</div><div class="author-info__description text-center">a student of HITsz————坚持滑板，热爱摇滚，偶尔弹吉他，喜欢阅读，抽空打游戏，在AI小白之路上踽踽独行。</div><div class="follow-button"><a href="https://web.okjike.com/user/9e0ec001-4bb6-4cab-af94-ea8b2f6067ef/post" target="_blank">在即刻上关注我</a></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">文章</span><span class="pull-right">23</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">标签</span><span class="pull-right">19</span></a><a class="author-info-articles__categories article-meta" href="/categories"><span class="pull-left">分类</span><span class="pull-right">3</span></a></div><hr><div class="author-info-links"><div class="author-info-links__title text-center">友链</div><a class="author-info-links__name text-center" href="https://www.liaoxuefeng.com" target="_blank">廖雪峰的博客</a><a class="author-info-links__name text-center" href="https://mooc.study.163.com/smartSpec/detail/1001319001.htm" target="_blank">网易机器学习公开课</a><a class="author-info-links__name text-center" href="https://developers.google.com/machine-learning/crash-course/?hl=zh-cn" target="_blank">谷歌机器学习速成</a><a class="author-info-links__name text-center" href="http://www.hitsz.edu.cn/index.html" target="_blank">哈工大深圳主页</a></div></div></div><div id="content-outer"><div id="top-container" style="background-image: url(https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_topimg.png)"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">艺琛的 Livehouse</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus"><a class="site-page social-icon search"><i class="fa fa-search"></i><span> 搜索</span></a><a class="site-page" href="/">主页</a><a class="site-page" href="/categories/学习笔记">学习笔记</a><a class="site-page" href="/categories/读书观影笔记">读书观影笔记</a><a class="site-page" href="/categories/个人随想">个人随想</a><a class="site-page" href="/categories/爱好和生活">爱好和生活</a><a class="site-page" href="/gallery">相册</a><a class="site-page" href="/archives">所有博客</a><a class="site-page" href="/tags">特色标签</a><a class="site-page" href="/about">关于我</a></span></div><div id="post-info"><div id="post-title">coursera 吴恩达深度学习 Specialization 笔记（course 4 week 3）—— 物体检测</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2018-10-23</time><span class="post-meta__separator">|</span><i class="fa fa-inbox post-meta__icon" aria-hidden="true"></i><a class="post-meta__categories" href="/categories/学习笔记/">学习笔记</a></div></div></div><div class="layout" id="content-inner"><article id="post"><div class="article-container" id="post-content"><p>本周主要学习如何通过 CNN 来进行物体检测。</p>
+<h2 id="物体定位（单个物体）"><a href="#物体定位（单个物体）" class="headerlink" title="物体定位（单个物体）"></a>物体定位（单个物体）</h2><h3 id="什么是物体定位"><a href="#什么是物体定位" class="headerlink" title="什么是物体定位"></a>什么是物体定位</h3><ul>
+<li>图像分类：图片中是否有车</li>
+<li>物体定位：不仅要识别出是否有车（单个对象），还要在车的周围生成一个边框，即分类+定位</li>
+<li>物体检测：找到一张图片里的<strong>多个</strong>对象并定位它们</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_1.png" alt=""></p>
+<a id="more"></a>
+<h3 id="如何定位"><a href="#如何定位" class="headerlink" title="如何定位"></a>如何定位</h3><p>假设我们需要找出图片中是否有以下四类对象：</p>
+<ul>
+<li>行人</li>
+<li>车</li>
+<li>摩托车</li>
+<li>无物体</li>
+</ul>
+<p>我们最后用 softmax 输出四个分类，不仅如此，为了找出它们的位置，还需要输出以下四个值：</p>
+<ul>
+<li>$b_x$ ：方框中心的横坐标</li>
+<li>$b_y$：方框中心的纵坐标</li>
+<li>$b_h$：方框的高度</li>
+<li>$b_w$：方框的宽度</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_2.png" alt=""></p>
+<p>最后目标标签为：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_3.png" alt=""></p>
+<ul>
+<li>Pc 指的是图片中存在该单个对象的概率，若有则值为 1，若没有则值为 0</li>
+<li>C1、C2、C3 当物体为某个类时，对应的 C 值取 1，其他取 0</li>
+<li>当 Pc 为 0 时，也就是图片中不存在物体时，剩下的 ？ 值表示我们并不关心这些值是多少</li>
+</ul>
+<h3 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h3><p>假设使用平方误差，那么：</p>
+<script type="math/tex; mode=display">
+L(\hat y ,y)=\left\{\begin{matrix}
+(\hat y_1-y_1)^2+(\hat y_2-y_2)^2+...+(\hat y_8-y_8)^2 & if \ \ y_1 =1\\ 
+ (\hat y_1-y_1)^2& if \ \ y _1=0
+\end{matrix}\right.</script><h2 id="特征点检测"><a href="#特征点检测" class="headerlink" title="特征点检测"></a>特征点检测</h2><p>当我们需要找出图片中的一些特征点时，我们可以在标签中增加这些点的坐标。</p>
+<p>例如我们需要识别出下面这张脸的五官的轮廓，我们可以定义一些特征点，产生含有这些特征点坐标的训练集，然后我们将图片丢进神经网络，最后输出若干个值。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_4.png" alt=""></p>
+<h2 id="物体检测（多个物体）"><a href="#物体检测（多个物体）" class="headerlink" title="物体检测（多个物体）"></a>物体检测（多个物体）</h2><h3 id="滑动窗口检测法-Sliding-Windows"><a href="#滑动窗口检测法-Sliding-Windows" class="headerlink" title="滑动窗口检测法 Sliding Windows"></a>滑动窗口检测法 Sliding Windows</h3><p>拍一张照片然后裁剪掉其他不是汽车的部分，得到一张汽车剧中并几乎占全部画面的紧密裁剪的汽车图像，使用许多紧密裁剪的汽车图像作为训练集，训练一个神经网络判断是车。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_5.png" alt=""></p>
+<p>在一张可能包含汽车的大图像中，先选择一个窗口尺寸，然后只读取这个小窗口内的图像，输入到上面训练的卷积网络中，做一个预测，滑动窗口检测指的是将小窗口按步长移动到下一个位置，再重复上述操作，再移动窗口，重复上述操作，直到滑动窗口遍历了图像中的所有位置。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_6.png" alt=""></p>
+<p>然后我们可以取不同大小的窗口重复上述操作，只要图像某处中有一辆车，那么就会有某个窗口会圈住一辆车然后检测出来。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_7.png" alt=""></p>
+<p>缺点：</p>
+<ul>
+<li>当你使用较大的窗口移动步长，算法表现会下降</li>
+<li>当你使用较小的步长，计算成本则会非常高</li>
+</ul>
+<h3 id="滑动窗口检测的卷积实现"><a href="#滑动窗口检测的卷积实现" class="headerlink" title="滑动窗口检测的卷积实现"></a>滑动窗口检测的卷积实现</h3><p>如果每个小窗口的图像都通过这么一个卷积网络：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_8.png" alt=""></p>
+<p>我们将全连接层改造成以下的结构，实现参数共享，减少计算量：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_9.png" alt=""></p>
+<p>具体做法是：</p>
+<p>我们将待检测的大图像直接输入到我们改造后的（本来用来预测窗口图像的）卷积网络中，最后的输出就是我们对应的每个滑动窗口的结果，而不是一个窗口一个窗口滑动，截取图像然后输入。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_10.png" alt=""></p>
+<p>由于直接将整个图像输入到训练好的网络，在同一时间将所有的滑动窗口实现了前向传播，实现了参数的共享，减少了计算的成本。</p>
+<p>缺点：由于窗口只能是正方形，所以边界框的位置不准确。</p>
+<h2 id="边界框预测"><a href="#边界框预测" class="headerlink" title="边界框预测"></a>边界框预测</h2><h3 id="YOLO-算法介绍"><a href="#YOLO-算法介绍" class="headerlink" title="YOLO 算法介绍"></a>YOLO 算法介绍</h3><p>为了更好地检测出物体的真实边界，可以使用 YOLO 算法，是 you only look once 的缩写。</p>
+<p>有一张图片，首先用 9×9 的网络划分（当然实际使用中可以使用更加精细的），然后将开始学到的<strong>物体定位</strong>算法运用在这每一个网格中。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_12.png" alt=""></p>
+<p>那么根据每个网格是否有物体，如果有，那么边界框坐标是多少，是什么类别，得到每个网格的标签值 y 为：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_13.png" alt=""></p>
+<blockquote>
+<p>值得注意的是，每个物体就算跨越了多个网格，我们也只能将其划分到它<strong>中心点</strong>所在的网格里。</p>
+</blockquote>
+<p>所以最后将这些标签堆叠起来形成一个维度为 3×3×8 的标签（8 指的是每个网格的 8 个标签值）。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_14.png" alt=""></p>
+<p>我们要做的是输入训练集进入一个卷积网络，我们通过调整网络超参数使得最后输出一个 3×3×8 的向量，这就与我们 3×3×8 的标签形成对应，构造代价函数。经过训练之后，我们随便输入一张图像，就可以知道在网格每个位置是否存在物体，对应的边界框坐标是什么。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_15.png" alt=""></p>
+<h3 id="如何确定边界框的参数"><a href="#如何确定边界框的参数" class="headerlink" title="如何确定边界框的参数"></a>如何确定边界框的参数</h3><p>一种方法是令网格的左上角为（0，0），右下角为（1，1），那么中心点的坐标由它相对（0，0）的位置决定，一定介于 0～1 之间；而方框的长跟宽根据它和网格宽度的比例决定，可以超过 1.</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_16.png" alt=""></p>
+<p>例如上面黄色中心点的坐标约为（0.4，0.3，0.9，0.5）。</p>
+<h2 id="如何评价物体检测算法"><a href="#如何评价物体检测算法" class="headerlink" title="如何评价物体检测算法"></a>如何评价物体检测算法</h2><p>为了知道物体检测算法的性能好坏，可以使用一个叫做<strong>“交并比 (Intersection Over Union)”</strong>的函数.</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_18.png" alt=""></p>
+<p>假设红框是实际的边界，紫框是算法预测的边界，黄色部分是两者的交集，绿色部分是两者的并集，那么：</p>
+<p>交并比 IoU = 交集的面积 / 并集的面积。</p>
+<p>判别：一般来说，如果 IoU 大于等于 <strong>0.5</strong>，便可认为定位正确。也可以定义更严格的值。</p>
+<h2 id="抑制非最大值-non-max-suppression"><a href="#抑制非最大值-non-max-suppression" class="headerlink" title="抑制非最大值 non-max suppression"></a>抑制非最大值 non-max suppression</h2><p>如下图所示，一个 19×19 的网格将图片划分，运行 YOLO 算法，可能对于一辆汽车，有许多网格都认为该汽车的中心点在它那里，即这辆汽车的范围内的许多网格都认为自己检测到了汽车了，发生重复检测的问题。抑制非最大值可以确保算法对一个物体只检测一次，而不是检测许多次。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_19.png" alt=""></p>
+<p>如果一辆车检测了许多次，就会在其周围产生许多方框，如下图所示，每个方框上的数字表示该网格认为自己检测到了物体的概率：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_20.png" alt=""></p>
+<p>抑制非最大值的具体的做法为（假设只是检测单一物体）：</p>
+<ul>
+<li>每个网格的输出为：$\begin{bmatrix}<br>p_c\\<br>b_x\\<br>b_y\\<br>b_h\\<br>b_w\\<br>\end{bmatrix}$ </li>
+<li>丢弃所有低概率网格，例如 $p_c \leqslant 0.6$ （或其他概率）的网格</li>
+<li>在剩下的网格中<ul>
+<li>挑选出具有最大 $p_c$ 值的网格</li>
+<li>丢弃那些与刚刚选出的网格的 IoU 值大于 0.5 的网格</li>
+</ul>
+</li>
+</ul>
+<p>如果检测是多种物体，比如汽车、行人、摩托车，那么正确的做法是：各自独立，进行三次“抑制非最大值”。</p>
+<h2 id="锚框法-anchor-boxes"><a href="#锚框法-anchor-boxes" class="headerlink" title="锚框法 anchor boxes"></a>锚框法 anchor boxes</h2><p>目前看过的物件检测算法，有一个问题是每一个网格只能侦测一个物件，如果一个网格想要侦测多个物体，可以使用“锚框法 anchor boxes”。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_21.png" alt=""></p>
+<p>对于上面这张图，我们发现人和汽车的中心点几乎重叠在一起，在一个格子里，如果输出 $y = \left[ \begin{array} { c } { p _ { c } } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { w } } \\ { b _ { w } } \\ { c _ { 1 } } \\ { c _ { 2 } \\ c_3 } \end{array} \right]$，那么它无法同时输出两个物体的方框，只能二选一，我们可以在这个网格画出两个锚框（也可能更多）框住这两个物体，如下图所示：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_22.png" alt=""></p>
+<p>然后将输出的标签改为：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_23.png" alt=""></p>
+<p>用锚框 1 来框住行人，锚框 2 来框住汽车。</p>
+<p>在使用锚框前：训练图片中的每个物体被分给一个包含了它中心点的格子。输出维度 3×3×8。</p>
+<p>使用锚框后：训练图片中的每个物体被分给（1）包含了它中心点的格子（2）这个格子里据有更高 IoU 的锚框。输出维度为 3×3×2×8。</p>
+<p>举个例子：</p>
+<p> 标签值 $y=\left[ \begin{array} { l } { p _ { c } } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { c_ { 1 } } \\ { c _ { 2 } }\\ { c _ { 3 } } \\ { p _ { c } } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { c _ { 1 } } \\ { c _ { 2 } } \\ { c _ { 3 } }  \end{array} \right]$，假如某个网格有两个物体，则为 $ \left[ \begin{array} { l } { 1 } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { 1 } \\ { 0}\\ { 0 } \\ { 1 } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { 0 } \\ { 1 } \\ { 0 }  \end{array} \right] $，如果只有车，则为 $ \left[ \begin{array} { l } { 0 } \\ { ？ } \\ { ？} \\ { ？ } \\ {  ？ } \\ { ？} \\ { ？}\\ { ？ } \\ { 1 } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { 0 } \\ { 1 } \\ { 0 }  \end{array} \right] $  </p>
+<p>实际上，在一个网格处理两个物体的情况很少发生，尤其是当网格为 19×19 时。</p>
+<h2 id="YOLO-物体检测算法"><a href="#YOLO-物体检测算法" class="headerlink" title="YOLO 物体检测算法"></a>YOLO 物体检测算法</h2><p>综合上面所有要素，来组成目前最先进的目标检测算法——YOLO 算法。</p>
+<h3 id="构建训练集并训练"><a href="#构建训练集并训练" class="headerlink" title="构建训练集并训练"></a>构建训练集并训练</h3><ul>
+<li>三个分类类别：行人、汽车、摩托车</li>
+<li>两个锚框</li>
+<li>3×3 的网格划分（实际中一般是 19×19）</li>
+<li>遍历每张图片的 9 个网格，得到标签向量，维度是 3×3×2×8</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_24.png" alt=""></p>
+<h3 id="进行预测"><a href="#进行预测" class="headerlink" title="进行预测"></a>进行预测</h3><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_25.png" alt=""></p>
+<h3 id="非最大值抑制"><a href="#非最大值抑制" class="headerlink" title="非最大值抑制"></a>非最大值抑制</h3><ul>
+<li><p>每个网格都会得到两个预测的边界框（因为有两个锚框）</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_26.png" alt=""></p>
+</li>
+<li><p>去掉所有低概率预测</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_27.png" alt=""></p>
+</li>
+<li><p>对于分类的每个类别（行人、汽车、摩托车），单独对每个预测的类别执行非最大值抑制，重复几次，得到最终的预测框</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_28.png" alt=""></p>
+</li>
+</ul>
+</div></article><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/吴恩达深度学习笔记/">吴恩达深度学习笔记</a><a class="post-meta__tags" href="/tags/AI/">AI</a><a class="post-meta__tags" href="/tags/cnn/">cnn</a></div><div class="post-qr-code"><div class="post-qr-code-item"><img class="post-qr-code__img" src="/img/qr1.png"><div class="post-qr-code__desc">微信捐赠</div></div><div class="post-qr-code-item"><img class="post-qr-code__img" src="/img/qr2.jpg"><div class="post-qr-code__desc">支付宝捐赠</div></div></div><div class="social-share"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/js/social-share.min.js"></script><nav id="pagination"><div class="next-post pull-right"><a href="/2018/10/19/吴恩达机器学习c4w2编程作业/"><span>coursera 吴恩达深度学习 Specialization 编程作业（course 4 week 2）</span><i class="fa fa-chevron-right"></i></a></div></nav><div class="post-adv"><iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=530 height=86 src="//music.163.com/outchain/player?type=2&id=566993785&auto=1&height=66"></iframe></div><div id="lv-container" data-id="city" data-uid="MTAyMC8zODM1Mi8xNDg4MA=="><script>(function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+})(document, 'script');</script></div></div></div><footer><div class="layout" id="footer"><div class="copyright">&copy;2018 By 陈艺琛</div><div class="framework-info"><span>驱动 - </span><a href="http://hexo.io"><span>Hexo</span></a><span class="footer-separator">|</span><span>主题 - </span><a href="https://github.com/Molunerfinn/hexo-theme-melody"><span>Melody</span></a></div><div class="footer_custom_text">这里是我的一亩自耕田，记录自己的学习过程，生活随想和读书笔记，感谢您的参观！</div><div class="busuanzi"><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file-o"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="/js/third-party/anime.min.js"></script><script src="/js/third-party/jquery.min.js"></script><script src="/js/third-party/jquery.fancybox.min.js"></script><script src="/js/third-party/velocity.min.js"></script><script src="/js/third-party/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.5.6"></script><script src="/js/fancybox.js?version=1.5.6"></script><script src="/js/sidebar.js?version=1.5.6"></script><script src="/js/copy.js?version=1.5.6"></script><script src="/js/fireworks.js?version=1.5.6"></script><script src="/js/transition.js?version=1.5.6"></script><script src="/js/scroll.js?version=1.5.6"></script><script src="/js/head.js?version=1.5.6"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  CommonHTML: {
+    linebreaks: { automatic: true, width: "90% container" }
+  },
+  "HTML-CSS": { 
+    linebreaks: { automatic: true, width: "90% container" }
+  },
+  "SVG": { 
+    linebreaks: { automatic: true, width: "90% container" }
+  }
+});
+</script><script type="text/x-mathjax-config">MathJax.Hub.Queue(function() {
+  var all = MathJax.Hub.getAllJax(), i;
+  for (i=0; i < all.length; i += 1) {
+    all[i].SourceElement().parentNode.className += ' has-jax';
+  }
+});
+</script><script src="https://cdn.bootcss.com/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script src="/js/search/local-search.js"></script><div class="search-dialog" id="local-search"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章"></div></div></div><hr><div id="local-search-results"><div id="local-hits"></div><div id="local-stats"><div class="local-search-stats__hr" id="hr"><span>由</span> <a href="https://github.com/wzpan/hexo-generator-search" style="color:#49B1F5;">hexo-generator-search</a>
+ <span>提供支持</span></div></div></div><span class="search-close-button"><i class="fa fa-times"></i></span></div><div class="search-mask"></div></body></html>
