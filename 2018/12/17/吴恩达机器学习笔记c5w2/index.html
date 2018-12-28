@@ -1,0 +1,157 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="coursera 吴恩达深度学习 Specialization 笔记（course 5 week 1）—— 循环神经网络 RNN"><meta name="keywords" content="吴恩达深度学习笔记,AI,Word Embedding"><meta name="author" content="陈艺琛,undefined"><meta name="copyright" content="陈艺琛"><title>coursera 吴恩达深度学习 Specialization 笔记（course 5 week 1）—— 循环神经网络 RNN | 艺琛的 Livehouse</title><link rel="shortcut icon" href="/img/logo1.png"><link rel="stylesheet" href="/css/index.css?version=1.5.6"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css?version=1.5.6"><link rel="dns-prefetch" href="https://cdn.staticfile.org"><link rel="dns-prefetch" href="https://cdn.bootcss.com"><link rel="dns-prefetch" href="https://creativecommons.org"><link rel="dns-prefetch" href="https://hm.baidu.com"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?20c8efd323cd63b9f6bf846113eb6f60";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();</script><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容:${query}"}},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  }
+} </script></head><body><canvas class="fireworks"></canvas><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar"><div class="toggle-sidebar-info text-center"><span data-toggle="切换文章详情">切换站点概览</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Word-Embeddings-词嵌入介绍"><span class="toc-number">1.</span> <span class="toc-text">Word Embeddings 词嵌入介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Word-representation"><span class="toc-number">1.1.</span> <span class="toc-text">Word representation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用词嵌入"><span class="toc-number">1.2.</span> <span class="toc-text">使用词嵌入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#词嵌入的属性"><span class="toc-number">1.3.</span> <span class="toc-text">词嵌入的属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#嵌入矩阵-Embedding-matrix"><span class="toc-number">1.4.</span> <span class="toc-text">嵌入矩阵 Embedding matrix</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#学习词嵌入：Word2vec-and-Glove"><span class="toc-number">2.</span> <span class="toc-text">学习词嵌入：Word2vec and Glove</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#“学习”词嵌入"><span class="toc-number">2.1.</span> <span class="toc-text">“学习”词嵌入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#构造-上下文-目标词-组合"><span class="toc-number">2.1.1.</span> <span class="toc-text">构造 上下文/目标词 组合</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Word2Vec"><span class="toc-number">2.2.</span> <span class="toc-text">Word2Vec</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Skip-gram"><span class="toc-number">2.2.1.</span> <span class="toc-text">Skip-gram</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#model-details"><span class="toc-number">2.2.2.</span> <span class="toc-text">model details</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#用-softmax-进行分类的问题"><span class="toc-number">2.2.3.</span> <span class="toc-text">用 softmax 进行分类的问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如何选择-context-c"><span class="toc-number">2.2.4.</span> <span class="toc-text">如何选择 context c</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#负采样算法-negative-sampling"><span class="toc-number">2.3.</span> <span class="toc-text">负采样算法 negative sampling</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#如何选取-k？"><span class="toc-number">2.3.1.</span> <span class="toc-text">如何选取 k？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#算法细节"><span class="toc-number">2.3.2.</span> <span class="toc-text">算法细节</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如何抽取负样本？"><span class="toc-number">2.3.3.</span> <span class="toc-text">如何抽取负样本？</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GloVe-词向量-global-vector"><span class="toc-number">2.4.</span> <span class="toc-text">GloVe 词向量 (global vector )</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#词嵌入的应用"><span class="toc-number">3.</span> <span class="toc-text">词嵌入的应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#情感分类"><span class="toc-number">3.1.</span> <span class="toc-text">情感分类</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#一个简单的情感分类模型"><span class="toc-number">3.1.1.</span> <span class="toc-text">一个简单的情感分类模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#用-RNN-进行情感分类"><span class="toc-number">3.1.2.</span> <span class="toc-text">用 RNN 进行情感分类</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#词嵌入“去偏见”-Debiasing-word-embedding"><span class="toc-number">3.2.</span> <span class="toc-text">词嵌入“去偏见” Debiasing word embedding</span></a></li></ol></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/avater.jpg"></div><div class="author-info__name text-center">陈艺琛</div><div class="author-info__description text-center">a student of HITsz————坚持滑板，热爱摇滚，偶尔弹吉他，喜欢阅读，抽空打游戏，在AI小白之路上踽踽独行。</div><div class="follow-button"><a href="https://web.okjike.com/user/9e0ec001-4bb6-4cab-af94-ea8b2f6067ef/post" target="_blank">在即刻上关注我</a></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">文章</span><span class="pull-right">33</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">标签</span><span class="pull-right">27</span></a><a class="author-info-articles__categories article-meta" href="/categories"><span class="pull-left">分类</span><span class="pull-right">3</span></a></div><hr><div class="author-info-links"><div class="author-info-links__title text-center">友链</div><a class="author-info-links__name text-center" href="https://www.liaoxuefeng.com" target="_blank">廖雪峰的博客</a><a class="author-info-links__name text-center" href="https://mooc.study.163.com/smartSpec/detail/1001319001.htm" target="_blank">网易机器学习公开课</a><a class="author-info-links__name text-center" href="https://developers.google.com/machine-learning/crash-course/?hl=zh-cn" target="_blank">谷歌机器学习速成</a><a class="author-info-links__name text-center" href="http://www.hitsz.edu.cn/index.html" target="_blank">哈工大深圳主页</a></div></div></div><div id="content-outer"><div id="top-container" style="background-image: url(https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_topimg.png)"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">艺琛的 Livehouse</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus"><a class="site-page social-icon search"><i class="fa fa-search"></i><span> 搜索</span></a><a class="site-page" href="/">主页</a><a class="site-page" href="/categories/学习笔记">学习笔记</a><a class="site-page" href="/categories/读书观影笔记">读书观影笔记</a><a class="site-page" href="/categories/个人随想">个人随想</a><a class="site-page" href="/categories/爱好和生活">爱好和生活</a><a class="site-page" href="/gallery">相册</a><a class="site-page" href="/archives">所有博客</a><a class="site-page" href="/tags">特色标签</a><a class="site-page" href="/about">关于我</a></span></div><div id="post-info"><div id="post-title">coursera 吴恩达深度学习 Specialization 笔记（course 5 week 1）—— 循环神经网络 RNN</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2018-12-17</time><span class="post-meta__separator">|</span><i class="fa fa-inbox post-meta__icon" aria-hidden="true"></i><a class="post-meta__categories" href="/categories/学习笔记/">学习笔记</a></div></div></div><div class="layout" id="content-inner"><article id="post"><div class="article-container" id="post-content"><p>自然语言处理和深度学习是非常重要的组合。使用词向量表示和嵌入层可以在许多行业训练 RNN，例如情感分析，命名实体识别和机器翻译。</p>
+<h2 id="Word-Embeddings-词嵌入介绍"><a href="#Word-Embeddings-词嵌入介绍" class="headerlink" title="Word Embeddings 词嵌入介绍"></a>Word Embeddings 词嵌入介绍</h2><h3 id="Word-representation"><a href="#Word-representation" class="headerlink" title="Word representation"></a>Word representation</h3><p>如何用向量表示一个词？假设我们有一个词汇表 V，数量为 |V| = 10000，V = {a, aaron,…, zulu,\<unk>}，我们可以用 one-hot 编码来表示这些词：</unk></p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_1.png" alt=""></p>
+<a id="more"></a>
+<p>但是问题是，对于这两个句子：</p>
+<ul>
+<li>I want a glass of orange ____.</li>
+<li>I want a glass of apple ____.</li>
+</ul>
+<p>对于算法来说，orange juice 是一个非常可能的选择，那么对于 apple 来说，apple juice 也是一个很可能的选择，但是由于 one-hot 编码没能体现出 orange 和 apple 的密切关系（都是水果），所以在这里单词 king 和 orange 的相关程度并不比 apple 低。用词向量表示可以解决这个问题。</p>
+<p>我们先创建一系列特征：性别 gender、皇室 royal、年龄 age、食物 food……用一个数字表示某个词跟这个特征的相关程度，然后形成一个特征向量。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_2.png" alt=""></p>
+<p>于是，我们可以发现 apple 和 orange 具有更加接近的特征向量，在这一点上与实际情况更加符合。</p>
+<p>将这些特征向量可视化，我们可以发现这些词是一组一组分布的。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_3.png" alt=""></p>
+<p>什么是词嵌入？假设特征向量的维度是三维，这形成一个三维的特征空间，每个词在这个空间中占据一个位置，就如同嵌入一样，所以我们称之为“词嵌入”。其实词嵌入相当于给词编码。</p>
+<h3 id="使用词嵌入"><a href="#使用词嵌入" class="headerlink" title="使用词嵌入"></a>使用词嵌入</h3><p>词嵌入对于迁移学习非常有用，即将具有很多数据集的任务 A 迁移到数据集较少的任务 B。</p>
+<ul>
+<li>从大量的文本语料库（十亿到几千亿个单词）中学习单词嵌入，或者下载在线的训练好的词嵌入。</li>
+<li>将这些词嵌入迁移学习到训练集更小的新任务上。（比如十万个词左右）</li>
+<li>可选：继续使用新数据来微调词嵌入。如果第二步训练集太小，通常不会继续微调。</li>
+</ul>
+<h3 id="词嵌入的属性"><a href="#词嵌入的属性" class="headerlink" title="词嵌入的属性"></a>词嵌入的属性</h3><p>我们可以用词向量来进行词的类比：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_4.png" alt=""></p>
+<p>在词向量空间中，代表 man 的这个词的词向量和代表 woman 这个词的词向量之间的距离与 king 向量和 queen 向量之间的距离近似相等，如下图所示：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_5.png" alt=""></p>
+<p>要找到和 man -&gt; woman 类似的一对词 king -&gt; ?，我们可以遍历所有词向量，找到这么一个词 w 满足：$sim(e_w,e_{king}-e_{man}+e_{woman})$ 最大，其中 sim() 是 “cosine 相似度”。</p>
+<script type="math/tex; mode=display">
+sim(u,v)=\frac{u^Tv}{||u||_2||v||_2}</script><p>它其实表示的是向量 u 和 v 之间的 cos 值，cos 值越大表示两者夹角越小，相似度越大。</p>
+<p>另外 $||u-v||^2$ 也可以表示两者的相似度。</p>
+<h3 id="嵌入矩阵-Embedding-matrix"><a href="#嵌入矩阵-Embedding-matrix" class="headerlink" title="嵌入矩阵 Embedding matrix"></a>嵌入矩阵 Embedding matrix</h3><p>当实现一个算法来学习字嵌入时，最终学习到的是一个嵌入矩阵 E，这个矩阵乘上某个词（例如位于 6257 位的 orange ）的 one-hot 向量（$o_{6257}$）得到它的词向量（$e_{6257}$），即：</p>
+<script type="math/tex; mode=display">
+E·o_j=e_j</script><p>其中 E 代表 Embedding 矩阵，o 代表 one-hot 向量，e 代表 embedding 向量。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_6.png" alt=""></p>
+<p>值得注意的是，实际中由于向量 o 大部分都是 0，所以不会真正地用 E 去对它进行矩阵乘法，而是使用特殊的函数进行查找。</p>
+<h2 id="学习词嵌入：Word2vec-and-Glove"><a href="#学习词嵌入：Word2vec-and-Glove" class="headerlink" title="学习词嵌入：Word2vec and Glove"></a>学习词嵌入：Word2vec and Glove</h2><h3 id="“学习”词嵌入"><a href="#“学习”词嵌入" class="headerlink" title="“学习”词嵌入"></a>“学习”词嵌入</h3><p>如何通过算法学习得到词嵌入矩阵呢？</p>
+<p>例如我们需要通过前面若干词预测最后一个词，I want a glass of orange ____. 我们先将前六个词的 one-hot 向量（10000 ）乘上随机初始化的词嵌入矩阵 E，然后将得到的所有词向量 (300) 合并为一个向量 (1800)，接着通过一层隐藏层，最后通过 softmax 输出一个 one-hot 向量 (10000)，它就是我们的预测词。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_7.png" alt=""></p>
+<p>这个算法的一个超参数是选择固定窗的长度，上面是前六个词预测最后一个词，窗长就是六，也可以选择四个词的窗长，根据需要进行调整。</p>
+<p>算法的参数就是 W 和 b 这些权值，使用它们进行梯度下降，使得训练集出现的可能性最大化。</p>
+<p>这个算法为什么能学习到词嵌入？</p>
+<p>如果训练集语料库中出现了 orange juice 和 apple juice，那么在这种样例的激励下，算法就会学习到 orange 和 apple 具有非常相似的词嵌入，这样才能更好地拟合训练集。</p>
+<h4 id="构造-上下文-目标词-组合"><a href="#构造-上下文-目标词-组合" class="headerlink" title="构造 上下文/目标词 组合"></a>构造 上下文/目标词 组合</h4><p>对于一句话 I want a glass of orange <strong>juice</strong> to go along with my cereal. </p>
+<p>假如 juice 是我们需要预测的目标词，那么有许多种构造上下文来预测它的方法：</p>
+<ul>
+<li>后面四个词</li>
+<li>左边四个右边四个</li>
+<li>最后一个词</li>
+<li>附近一个词</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_8.png" alt=""></p>
+<h3 id="Word2Vec"><a href="#Word2Vec" class="headerlink" title="Word2Vec"></a>Word2Vec</h3><h4 id="Skip-gram"><a href="#Skip-gram" class="headerlink" title="Skip-gram"></a>Skip-gram</h4><p>下面是一种训练词向量的 skip-gram 模型，skip-gram 指的是我们先取一个词作为 context word，然后在固定窗的长度内的另一个词作为目标词 target word，然后我们就可以建立起一个监督学习问题了。如下图所示。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_9.png" alt=""></p>
+<p>来自博客 <a href="https://blog.csdn.net/wangyangzhizhou/article/details/77530479" target="_blank" rel="noopener">seaboat</a> 的一张图片：<img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_20.png" alt=""></p>
+<h4 id="model-details"><a href="#model-details" class="headerlink" title="model details"></a>model details</h4><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_10.png" alt=""></p>
+<p>$o_c \rightarrow 乘上E \rightarrow e_c \rightarrow softmax(W·e_c+b) \rightarrow \hat y$</p>
+<p>其中 $W = \begin{bmatrix}<br>\theta_1^T\\<br>\theta_2^T\\<br>…\\<br>\theta_{10000}^T<br>\end{bmatrix}$ </p>
+<h4 id="用-softmax-进行分类的问题"><a href="#用-softmax-进行分类的问题" class="headerlink" title="用 softmax 进行分类的问题"></a>用 softmax 进行分类的问题</h4><script type="math/tex; mode=display">
+\hat y _t = p ( t | c ) = \frac { e ^ { \theta _ { t } ^ { T } e _ { c } } } { \sum _ { j = 1 } ^ { 10,000 } e ^ { \theta _ { j } ^ { T } e _ { c } } }</script><p>其中 $\theta_j$ 是 softmax 层的参数 W 的第 j 行，$\theta_t$ 是 W 中与输出有关的那一行。</p>
+<p>softmax 层存在的问题是：我们需要进行 10000 次加法，这会非常非常慢！！解决的办法是使用一种“分级 softmax”分类器 (hierarchical softmax classifier)。</p>
+<h4 id="如何选择-context-c"><a href="#如何选择-context-c" class="headerlink" title="如何选择 context c"></a>如何选择 context c</h4><p>我们必须先选择好 context c，再在窗内随机选择 target t，那么如何选择 c？</p>
+<p>一种办法是随机均匀地在文本中采样，但是问题是这样会采样进许多被频繁使用的词，比如 of the a an 等等，导致我们浪费时间在这些常用词的词嵌入上，所以我们需要在采样的时候适当地剔除这些词，实现常用词和不常用词的平衡。</p>
+<h3 id="负采样算法-negative-sampling"><a href="#负采样算法-negative-sampling" class="headerlink" title="负采样算法 negative sampling"></a>负采样算法 negative sampling</h3><p>首先定义一个新的监督学习问题，与上面 skip-gram 类似，先取一个词作为 context word，然后在固定窗的长度内随机挑选另一个词作为目标词 target word，如果选到了相关的词语例如 orange juice，那么这一个词语对的 y 值就是 1（正样本），否则就是 0（负样本），负样本的个数为 k.</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_11.png" alt=""></p>
+<h4 id="如何选取-k？"><a href="#如何选取-k？" class="headerlink" title="如何选取 k？"></a>如何选取 k？</h4><ul>
+<li>对于小数据集：k = 5～20</li>
+<li>对于大数据集：k = 2～5</li>
+</ul>
+<h4 id="算法细节"><a href="#算法细节" class="headerlink" title="算法细节"></a>算法细节</h4><p>我们知道上面的 Word2Vec 算法步骤为：</p>
+<p>$o_c \rightarrow E \rightarrow e_c \rightarrow softmax(W·e_c+b) \rightarrow one-hot向量\hat y$</p>
+<p>其中 $W = \begin{bmatrix}<br>\theta_1^T\\<br>\theta_2^T\\<br>…\\<br>\theta_{10000}^T<br>\end{bmatrix}$ ，$\hat y _t = p ( t | c ) = \frac { e ^ { \theta _ { t } ^ { T } e _ { c } } } { \sum _ { j = 1 } ^ { 10,000 } e ^ { \theta _ { j } ^ { T } e _ { c } } }$ </p>
+<p>而负采样算法去掉 softmax 的步骤，改为对 $e_c$ 进行 10000 次逻辑回归：</p>
+<script type="math/tex; mode=display">
+P(y=1|c,t)=sigmoid(\theta_t^Te_c)</script><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_12.png" alt=""></p>
+<p>在实际中，我们只训练其中的 k+1 个逻辑回归模型，即训练 1 个正样本和 k 个负样本的逻辑回归模型，这样使得我们不用计算 10000 元分类的 softmax 层，大大减少计算量。</p>
+<h4 id="如何抽取负样本？"><a href="#如何抽取负样本？" class="headerlink" title="如何抽取负样本？"></a>如何抽取负样本？</h4><p>算法作者 Mikolov 认为，最好的方法是介于根据经验分布的采样和均匀分布的采样之间，他们所做的是根据词频的 3/4 次幂来抽样。</p>
+<script type="math/tex; mode=display">
+P(w_i)=\frac{f^{\frac{3}{4}}(w_i)}{\sum^{10000}_{j=1}f^{\frac{3}{4}}(w_j)}</script><p>其中 $f^(w_i)$ 表示观察到的英语中某个词的词频。</p>
+<h3 id="GloVe-词向量-global-vector"><a href="#GloVe-词向量-global-vector" class="headerlink" title="GloVe 词向量 (global vector )"></a>GloVe 词向量 (global vector )</h3><p>首先我们有一个目标词 i，还有一个上下文词 j，那么用 $X_{ij}$ 表示 i 出现在 j 的上下文的次数，一般来说，$X_{ij}=X_{ji}$ ，也就是说它表示 i 和 j 共同出现在一个上下文的次数，或者说<strong>彼此接近的频繁程度</strong>，可以遍历语料库数出来。</p>
+<p>GloVe 算法就是实现以下的优化问题：</p>
+<script type="math/tex; mode=display">
+minimize \sum\limits_{i=1}^{10000}\sum\limits_{j=1}^{10000} f(X_{ij})(\theta_i^T e_{j} + b_i+b'_j -logX_{ij})^2</script><p>其中：</p>
+<ul>
+<li>10000 是词汇表的个数，遍历整个词汇表</li>
+<li>$\theta、b_i、b’_j$ 都是待学习的参数</li>
+<li>为了防止出现 $log0$ 无意义的情况，加上权重值 $f(x_{ij})$，当 $X_{ij}=0$ 时，$f(x_{ij})=0$，定义 $0log0=0$，另外权重函数可以使得对“榴莲”这种较少出现的词给出不太小的权重，给“of the an”等常见的词给出不太大的权重</li>
+<li>一个有趣的事实是：$\theta_i $ 和 $e_j$ 是对称的，也就是说它们两者互为参数，起到的作用是相同的，所以我们最后学习到的参数可以是这两者的平均值，即 $e_w^{(final)}=\frac{e_w+\theta_w}{2}$ </li>
+</ul>
+<h2 id="词嵌入的应用"><a href="#词嵌入的应用" class="headerlink" title="词嵌入的应用"></a>词嵌入的应用</h2><h3 id="情感分类"><a href="#情感分类" class="headerlink" title="情感分类"></a>情感分类</h3><p>情感分类的任务是分析一段文本，告诉人们某个人是不是喜欢他们正在谈论的东西 。它是自然语言处理最重要的组成部分，有许多应用。情感分类的挑战之一是可能缺乏一个特别大的标签训练集，不过使用词嵌入后，依靠一个中等大小的标签训练集也可以构建出一个很好的情感分类器。</p>
+<p>假设有一些顾客对一家酒店的评价和这些顾客打出的星级，如下图所示：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_13.png" alt=""></p>
+<p>我们需要一个情感分类器，输入一段评价，然后猜出他给出的星级。</p>
+<h4 id="一个简单的情感分类模型"><a href="#一个简单的情感分类模型" class="headerlink" title="一个简单的情感分类模型"></a>一个简单的情感分类模型</h4><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_14.png" alt=""></p>
+<p>这个算法的一个问题是它忽视了词的顺序，和上下文的联系，例如“Completelylacking in <strong>good</strong> taste, <strong>good</strong> service, and <strong>good</strong> ambience” ，句子中出现了很多 good，但是实际上这是一个一星的差评，更好的方法是使用 RNN 进行情感分类。</p>
+<h4 id="用-RNN-进行情感分类"><a href="#用-RNN-进行情感分类" class="headerlink" title="用 RNN 进行情感分类"></a>用 RNN 进行情感分类</h4><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_15.png" alt=""></p>
+<h3 id="词嵌入“去偏见”-Debiasing-word-embedding"><a href="#词嵌入“去偏见”-Debiasing-word-embedding" class="headerlink" title="词嵌入“去偏见” Debiasing word embedding"></a>词嵌入“去偏见” Debiasing word embedding</h3><p>由于词嵌入的训练语料是来自人类社会，而人类社会存在许多偏见，例如男人对应程序员，女人对应家庭主妇，而这是一个不正常的存在性别歧视的刻板印象。机器学习和 AI 算法越来越受人信任，可以用来帮人做出非常重要的决策，所以我们需要尽可能确保，算法中没有性别偏见、种族偏见等。一个不好的词嵌入会反应性别、种族、年龄和性取向，而比较好的算法应该能够得出：男人对应程序员而女人也对于程序员。这是非常具有人文主义的一项技术，展示了机器学习社群对减少社会偏见的责任感。</p>
+<p>那么如何减小词嵌入中的“偏见”呢？</p>
+<p>假设我们有一个训练好的词向量模型如下图所示：</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_16.png" alt=""></p>
+<ul>
+<li><p>第一步：确定偏差的方向</p>
+<p>假设词向量中只有一个维度是表示性别偏差的方向，那么 $e_{he}-e_{she}$ 、$e_{male}-e_{female}​$……然后将这些差值取平均，那么这个平均值向量就是表示偏差轴的向量，也就是偏差的方向。但是实际中使用了更复杂的 SVU 算法（一种类似于 PCA 主成份分析的算法）来确定偏差方向。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_17.png" alt=""></p>
+</li>
+<li><p>第二步是中立化（Neutralize）：对于没有性别定义的词例如 doctor 或者 babysitter，通过将它们映射到非偏差轴摆脱偏差，如下图所示。那么那些词需要中立化？作者训练一个分类器来研究这个问题，得出的结论是大部分的英语单词都需要中立化，除了那些有性别定义的一小部分词语。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_18.png" alt=""></p>
+</li>
+<li><p>第三步是平均化（equalization）：对于有性别定义的词例如 grandmother 和 grandfather 或者 boy 和 girl，我们希望这些词到非偏差轴的距离相同，即离修正后的 babysitter 这类词的距离相同，做法是移动 grandmother 和 grandfather 分别到一个点，使得到中间轴的距离相等。有许多这类词，grandmother-grandfather、 boy-girl、sorority-fraternity、girlhood-boyhood、sister-brother、niece-nephew、daughter-son 等等，这些都需要进行平均化。</p>
+<p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_19.png" alt=""></p>
+</li>
+</ul>
+</div></article><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/吴恩达深度学习笔记/">吴恩达深度学习笔记</a><a class="post-meta__tags" href="/tags/AI/">AI</a><a class="post-meta__tags" href="/tags/Word-Embedding/">Word Embedding</a></div><div class="post-qr-code"><div class="post-qr-code-item"><img class="post-qr-code__img" src="/img/qr1.png"><div class="post-qr-code__desc">微信捐赠</div></div><div class="post-qr-code-item"><img class="post-qr-code__img" src="/img/qr2.jpg"><div class="post-qr-code__desc">支付宝捐赠</div></div></div><div class="social-share"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/js/social-share.min.js"></script><nav id="pagination"><div class="prev-post pull-left"><a href="/2018/12/22/吴恩达机器学习c5w2编程作业/"><i class="fa fa-chevron-left">  </i><span>coursera 吴恩达深度学习 Specialization 编程作业（course 5 week 2）</span></a></div><div class="next-post pull-right"><a href="/2018/12/13/用 numpy 进行快速傅立叶变换 fft/"><span></span><i class="fa fa-chevron-right"></i></a></div></nav><div class="post-adv"><iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=530 height=86 src="//music.163.com/outchain/player?type=2&id=566993785&auto=1&height=66"></iframe></div><div id="lv-container" data-id="city" data-uid="MTAyMC8zODM1Mi8xNDg4MA=="><script>(function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+})(document, 'script');</script></div></div></div><footer><div class="layout" id="footer"><div class="copyright">&copy;2018 By 陈艺琛</div><div class="framework-info"><span>驱动 - </span><a href="http://hexo.io"><span>Hexo</span></a><span class="footer-separator">|</span><span>主题 - </span><a href="https://github.com/Molunerfinn/hexo-theme-melody"><span>Melody</span></a></div><div class="footer_custom_text">这里是我的一亩自耕田，记录自己的学习过程，生活随想和读书笔记，感谢您的参观！</div><div class="busuanzi"><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file-o"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="/js/third-party/anime.min.js"></script><script src="/js/third-party/jquery.min.js"></script><script src="/js/third-party/jquery.fancybox.min.js"></script><script src="/js/third-party/velocity.min.js"></script><script src="/js/third-party/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.5.6"></script><script src="/js/fancybox.js?version=1.5.6"></script><script src="/js/sidebar.js?version=1.5.6"></script><script src="/js/copy.js?version=1.5.6"></script><script src="/js/fireworks.js?version=1.5.6"></script><script src="/js/transition.js?version=1.5.6"></script><script src="/js/scroll.js?version=1.5.6"></script><script src="/js/head.js?version=1.5.6"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  CommonHTML: {
+    linebreaks: { automatic: true, width: "90% container" }
+  },
+  "HTML-CSS": { 
+    linebreaks: { automatic: true, width: "90% container" }
+  },
+  "SVG": { 
+    linebreaks: { automatic: true, width: "90% container" }
+  }
+});
+</script><script type="text/x-mathjax-config">MathJax.Hub.Queue(function() {
+  var all = MathJax.Hub.getAllJax(), i;
+  for (i=0; i < all.length; i += 1) {
+    all[i].SourceElement().parentNode.className += ' has-jax';
+  }
+});
+</script><script src="https://cdn.bootcss.com/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script src="/js/search/local-search.js"></script><div class="search-dialog" id="local-search"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章"></div></div></div><hr><div id="local-search-results"><div id="local-hits"></div><div id="local-stats"><div class="local-search-stats__hr" id="hr"><span>由</span> <a href="https://github.com/wzpan/hexo-generator-search" style="color:#49B1F5;">hexo-generator-search</a>
+ <span>提供支持</span></div></div></div><span class="search-close-button"><i class="fa fa-times"></i></span></div><div class="search-mask"></div></body></html>
