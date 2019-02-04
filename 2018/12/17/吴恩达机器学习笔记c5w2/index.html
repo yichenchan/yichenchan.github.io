@@ -69,7 +69,7 @@ E·o_j=e_j</script><p>其中 E 代表 Embedding 矩阵，o 代表 one-hot 向量
 <p>来自博客 <a href="https://blog.csdn.net/wangyangzhizhou/article/details/77530479" target="_blank" rel="noopener">seaboat</a> 的一张图片：<img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_20.png" alt=""></p>
 <h4 id="model-details"><a href="#model-details" class="headerlink" title="model details"></a>model details</h4><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_10.png" alt=""></p>
 <p>$o_c \rightarrow 乘上E \rightarrow e_c \rightarrow softmax(W·e_c+b) \rightarrow \hat y$</p>
-<p>其中 $W = \begin{bmatrix}<br>\theta_1^T\ <br>\theta_2^T\ <br>…\ <br>\theta_{10000}^T<br>\end{bmatrix}$ </p>
+<p>其中 $W = \begin{bmatrix}<br>\theta_1^T\\<br>\theta_2^T\\<br>…\\<br>\theta_{10000}^T<br>\end{bmatrix}$ </p>
 <h4 id="用-softmax-进行分类的问题"><a href="#用-softmax-进行分类的问题" class="headerlink" title="用 softmax 进行分类的问题"></a>用 softmax 进行分类的问题</h4><script type="math/tex; mode=display">
 \hat y _t = p ( t | c ) = \frac { e ^ { \theta _ { t } ^ { T } e _ { c } } } { \sum _ { j = 1 } ^ { 10,000 } e ^ { \theta _ { j } ^ { T } e _ { c } } }</script><p>其中 $\theta_j$ 是 softmax 层的参数 W 的第 j 行，$\theta_t$ 是 W 中与输出有关的那一行。</p>
 <p>softmax 层存在的问题是：我们需要进行 10000 次加法，这会非常非常慢！！解决的办法是使用一种“分级 softmax”分类器 (hierarchical softmax classifier)。</p>
@@ -83,7 +83,7 @@ E·o_j=e_j</script><p>其中 E 代表 Embedding 矩阵，o 代表 one-hot 向量
 </ul>
 <h4 id="算法细节"><a href="#算法细节" class="headerlink" title="算法细节"></a>算法细节</h4><p>我们知道上面的 Word2Vec 算法步骤为：</p>
 <p>$o_c \rightarrow E \rightarrow e_c \rightarrow softmax(W·e_c+b) \rightarrow one-hot向量\hat y$</p>
-<p> 其中 $W = \begin{bmatrix}\theta_1^T\  \theta_2^T\ …\ \theta_{10000}^T\end{bmatrix}，\hat y _t = p ( t | c ) = \frac { e ^ { \theta _ { t } ^ { T } e _ { c } } } { \sum _ { j = 1 } ^ { 10,000 } e ^ { \theta _ { j } ^ { T } e _ { c } } }$ </p>
+<p> 其中 $W = \begin{bmatrix}\theta_1^T\\  \theta_2^T\\ …\\ \theta_{10000}^T\end{bmatrix}，\hat y _t = p ( t | c ) = \frac { e ^ { \theta _ { t } ^ { T } e _ { c } } } { \sum _ { j = 1 } ^ { 10,000 } e ^ { \theta _ { j } ^ { T } e _ { c } } }$ </p>
 <p>而负采样算法去掉 softmax 的步骤，改为对 $e_c$ 进行 10000 次逻辑回归：</p>
 <script type="math/tex; mode=display">
 P(y=1|c,t)=sigmoid(\theta_t^Te_c)</script><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_12.png" alt=""></p>

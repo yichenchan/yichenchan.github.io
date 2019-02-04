@@ -95,7 +95,7 @@
 <li>则当结果为 0 的概率就是  $P(y=0|x)=1-\hat y$</li>
 <li>则结果为 y（0或1）的概率为 $P(y|x)=\hat y^y(1-\hat y)^{1-y}$，可带入y=0或1进行检验，发现该式子正确</li>
 <li>假设有一个容量为 m 的数据集（假设符合独立同分布），根据最大似然原理，我们要使得我们的假设的 $\hat y$ 最正确，最符合实际，那么必须满足使得“用 $\hat y$ 估计到的目前整个数据集的概率”<strong>最大</strong>（之所以越大越接近实际，是因为这些数据集已经存在，发生的概率便是 1），那么根据独立事件概率相乘原理：</li>
-<li>“用 $\hat y$ 估计到的目前整个数据集的概率”为 $L(\hat y)=P(y^{(1)}|x^{(1)})P(y^{(2)}|x^{(2)})…P(y^{(m)}|x^{(m)})\\\quad\quad =\prod\limits_{i=1}^m P(y^{(i)}|x^{(i)})\ \quad\quad =\prod\limits_{i=1}^m    {({\hat y^{(i)}})}   ^{y^{(i)}}          (   1   -    {\hat y^{(i)}}  )^{1-   y^{(i)}} $</li>
+<li>“用 $\hat y$ 估计到的目前整个数据集的概率”为 $L(\hat y)=P(y^{(1)}|x^{(1)})P(y^{(2)}|x^{(2)})…P(y^{(m)}|x^{(m)})\\\quad\quad =\prod\limits_{i=1}^m P(y^{(i)}|x^{(i)})\\ \quad\quad =\prod\limits_{i=1}^m    {({\hat y^{(i)}})}   ^{y^{(i)}}          (   1   -    {\hat y^{(i)}}  )^{1-   y^{(i)}} $</li>
 <li>为了让 $L(\hat y)$ <strong>最大</strong>，由于是连乘，我们让 $logL(\hat y)$ 最大，则 $logL(\hat y) = \sum\limits ^m_{i=1} y^{(i)}log{\hat y}^{(i)}+(1-y^{(i)})log(1-{\hat y}^{(i)})$</li>
 <li>而代价函数必须要<strong>尽量小</strong>，所以我们将 $logL(\hat y)$ 取负号，即 $-\sum\limits ^m_{i=1} y^{(i)}log{\hat y}^{(i)}+(1-y^{(i)})log(1-{\hat y}^{(i)})$</li>
 <li>为了让代价函数处于更好的尺度上，我们加上系数 1/m，即 $J(w,b)=-\frac{1}{m}\sum\limits ^m_{i=1} y^{(i)}log{\hat y}^{(i)}+(1-y^{(i)})log(1-{\hat y}^{(i)})$</li>
@@ -153,14 +153,14 @@
 <p>  首先初始化 $J=0;dw_1=0;dw_2=0;db=0$</p>
 <p>  遍历整个训练集：</p>
 <p>  For i = 1 to m:</p>
-<p>​         $z^{(i)}=w^Tx^{(i)}+b\\a^{(i)}=\sigma(z^{(i)})\\J+=-[y^{(i)}loga^{(i)}+(1-y^{(i)})log(1-a^{(i)})]\\dz^{(i)}=a^{(i)}-y^{(i)}\\dw_1+=x_1^{(i)}dz^{(i)}\\dw_2+=x_2^{(i)}dz^{(i)}\\dw_3…\\dw_4… \ …\\db+=dz^{(i)}$</p>
+<p>​         $z^{(i)}=w^Tx^{(i)}+b\\a^{(i)}=\sigma(z^{(i)})\\J+=-[y^{(i)}loga^{(i)}+(1-y^{(i)})log(1-a^{(i)})]\\dz^{(i)}=a^{(i)}-y^{(i)}\\dw_1+=x_1^{(i)}dz^{(i)}\\dw_2+=x_2^{(i)}dz^{(i)}\\dw_3…\\dw_4… \\ …\\db+=dz^{(i)}$</p>
 <p>  最后除以训练集个数：</p>
-<p>​         $J=J/m\\”dw_1”=\frac {\partial J}{\partial w_1}=dw_1/m\\”dw_2”=\frac {\partial J}{\partial w_2}=dw_2/m \ … \\”db”=\frac {\partial J}{\partial b}=db/m$</p>
+<p>​         $J=J/m\\”dw_1”=\frac {\partial J}{\partial w_1}=dw_1/m\\”dw_2”=\frac {\partial J}{\partial w_2}=dw_2/m \\ … \\”db”=\frac {\partial J}{\partial b}=db/m$</p>
 <blockquote>
 <p>我们可以看到为了求取代价函数的导数，我们需要进行两次遍历，这是一种十分低效的遍历方式，我们可以使用<strong>向量化（Vectorization）</strong>的方式加速我们的运算</p>
 </blockquote>
 <p>  最后用求得的代价函数的导数更新我们的参数：</p>
-<p>​        $w_1:=w_1-\alpha dw_1\\w_2:=w_2-\alpha dw_1 \ …\\b:=b-\alpha db$</p>
+<p>​        $w_1:=w_1-\alpha dw_1\\w_2:=w_2-\alpha dw_1 \\ …\\b:=b-\alpha db$</p>
 <h2 id="向量化（Vectorization）"><a href="#向量化（Vectorization）" class="headerlink" title="向量化（Vectorization）"></a>向量化（Vectorization）</h2><h3 id="什么是向量化"><a href="#什么是向量化" class="headerlink" title="什么是向量化"></a>什么是向量化</h3><ul>
 <li>是一门让代码变得高效的艺术</li>
 <li><p>遍历是<strong>非向量化</strong>，而向量化充分利用 CPU 和 GPU 的并行化实现更快的运算</p>
@@ -204,11 +204,11 @@
 <p>此处 b 为一个实数，但是 numpy 会自动将这个实数 b 拓展为一个 1 乘 m 的行向量，这个在 python 中称为 <strong>广播（broadcasting）</strong></p>
 </blockquote>
 <p><strong>求取 A</strong>：</p>
-<p>$A=[a^{(1)}    a^{(2)}  …  a{(m)}]= \sigma(Z)$</p>
+<p>$A=[a^{(1)}  \  a^{(2)} \ … \ a{(m)}]= \sigma(Z)$</p>
 </li>
 <li><p>反向传播</p>
 <p><strong>求取 dZ</strong>：</p>
-<p>$dZ=[dz^{(1)}  dz^{(2)}  …  dz^{(m)}]\\=[a^{(1)}-y^{(1)} \quad a^{(1)}-y^{(1)}  … \quad a^{(m)}-y^{(m)}]\\=A -Y $</p>
+<p>$dZ=[dz^{(1)} \ dz^{(2)} \ … \ dz^{(m)}]\\=[a^{(1)}-y^{(1)} \quad a^{(1)}-y^{(1)} \ … \quad a^{(m)}-y^{(m)}]\\=A -Y $</p>
 <p>其中 $Y=[y^{(1)}\quad y^{(2)}\quad … \quad y^{(m)}]$</p>
 <p><strong>求取 dw</strong>：</p>
 <p>$dw=\frac {1}{m}[x^{(1)} dz^{(1)} + x^{(2)} dz^{(2)} +…+x^{(m)} dz^{(m)}]\\=\frac {1}{m}[x^{(1)}\quad x^{(2)}\quad…\quad x^{(m)}][dz^{(1)}\quad dz^{(2)}\quad…\quad dz^{(m)}]^T\\=\frac {1}{m}X(dZ)^T$</p>

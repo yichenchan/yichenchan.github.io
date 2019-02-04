@@ -63,7 +63,7 @@
 <p>上述只适用于没有隐藏层的逻辑回归，如果是一个层数更多的模型呢？每一层的输出又是下一层的输入，那么我们就需要将每一层的输入都进行归一化操作，否则该层以后的训练都不会很有效率。对任何一个隐藏层的输入进行归一化操作就叫做批量归一化 BN。</p>
 <p>对于输入是在激活函数之前做归一化还是在之后做归一化存在争议，一般来说：<strong>对线性值 z 进行归一化，也就是在激活之前进行归一化</strong>。</p>
 <h3 id="批量归一化的实现"><a href="#批量归一化的实现" class="headerlink" title="批量归一化的实现"></a>批量归一化的实现</h3><p>下面是在神经网络某一层的实现过程：</p>
-<p>$\mu = \frac{1}{m} \sum\limits _i z^{(i)} \leftarrow 求数据的均值\ \sigma^2 = \frac{1}{m}\sum\limits _i (z^{(i)-\mu^{}})^2 \leftarrow 求数据的方差\ z_{norm}^{(i)}=\frac{z^{(i)}-\mu}{\sqrt{\sigma^2+\varepsilon}} \leftarrow 将数据归一化为正态分布\ \tilde{z}^{(i)}=\gamma z_{norm}^{(i)}+\beta \leftarrow 变换尺度，使得数据有可控的方差和均值$  </p>
+<p>$\mu = \frac{1}{m} \sum\limits _i z^{(i)} \leftarrow 求数据的均值\\ \sigma^2 = \frac{1}{m}\sum\limits _i (z^{(i)-\mu^{}})^2 \leftarrow 求数据的方差\\ z_{norm}^{(i)}=\frac{z^{(i)}-\mu}{\sqrt{\sigma^2+\varepsilon}} \leftarrow 将数据归一化为正态分布\\ \tilde{z}^{(i)}=\gamma z_{norm}^{(i)}+\beta \leftarrow 变换尺度，使得数据有可控的方差和均值$  </p>
 <ul>
 <li>其中 $\gamma,\beta$  是模型的参数，可以从反向传播中学习，使用梯度下降来更新它们</li>
 <li>$\varepsilon$ 是一个很小的数防止分母为零</li>
@@ -74,10 +74,10 @@
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_2.3_12.png" alt=""></p>
 <p>有效参数：$W^{[l]},\gamma^{[2]},\beta^{[l]}$ </p>
 <p>之所以参数没有 b，是因为在进行归一化时，参数 b 在均值中被减掉，所以永远是零，于是我们的前向传播算法变为</p>
-<p>$z^{[l]}=W^{[l]}a^{[l-1]} \ z_{norm}^{[l]}=\frac{z^{[l]}-\mu^{[l]}}{\sqrt{ {\sigma^2}^{[l]}+\varepsilon}} \ \tilde{z}^{[l]}=\gamma^{[l]} z_{norm}^{[l]}+\beta^{[l]}$ </p>
+<p>$z^{[l]}=W^{[l]}a^{[l-1]} \\ z_{norm}^{[l]}=\frac{z^{[l]}-\mu^{[l]}}{\sqrt{ {\sigma^2}^{[l]}+\varepsilon}} \\ \tilde{z}^{[l]}=\gamma^{[l]} z_{norm}^{[l]}+\beta^{[l]}$ </p>
 <p>其中参数 $z^{[l]},z_{norm}^{[l]},\tilde{z}^{[l]},\gamma^{[l]},\beta^{[l]}$ 的维度都是 $(n^{[l]},1)$ </p>
 <p>批量归一化的小批量梯度下降的实现过程：</p>
-<p>$for \quad t=1…num_minibatch:\ \quad \quad 计算第 t 批次的前向传播\ \quad \quad \quad \quad 在隐藏层中进行归一化，用 \tilde{z}^{[l]}代替z^{[l]} \ \quad \quad  用反向传播计算 dW^{[l]},d\beta^{[l]},d\gamma^{[l]} (没有 db^{[l]})\ \quad \quad 更新参数 W^{[l]}:=W^{[l]}-\alpha dW^{[l]} \ \quad \quad \quad \quad \quad \quad \beta^{[l]}:=\beta^{[l]}-\alpha d\beta^{[l]} \ \quad \quad \quad \quad \quad \quad \gamma ^{[l]}:=\gamma^{[l]}-\alpha d\gamma^{[l]}$ </p>
+<p>$for \quad t=1…num_minibatch:\\ \quad \quad 计算第 t 批次的前向传播\\ \quad \quad \quad \quad 在隐藏层中进行归一化，用 \tilde{z}^{[l]}代替z^{[l]} \\ \quad \quad  用反向传播计算 dW^{[l]},d\beta^{[l]},d\gamma^{[l]} (没有 db^{[l]})\\ \quad \quad 更新参数 W^{[l]}:=W^{[l]}-\alpha dW^{[l]} \\ \quad \quad \quad \quad \quad \quad \beta^{[l]}:=\beta^{[l]}-\alpha d\beta^{[l]} \\ \quad \quad \quad \quad \quad \quad \gamma ^{[l]}:=\gamma^{[l]}-\alpha d\gamma^{[l]}$ </p>
 <h3 id="为什么-BN-如此有效"><a href="#为什么-BN-如此有效" class="headerlink" title="为什么 BN 如此有效"></a>为什么 BN 如此有效</h3><h4 id="协变量"><a href="#协变量" class="headerlink" title="协变量"></a>协变量</h4><p>首先要提到协变量 (Covariate)，什么是协变量？它与自变量是相对的。</p>
 <p>自变量：指研究者主动操纵，而引起因变量发生变化的因素或条件，因此自变量被看作是因变量的原因。在机器学习中，训练的模型可以称之为自变量。 </p>
 <p>协变量：在实验的设计中，协变量是一个独立变量(解释变量)，不为实验者所操纵，但仍影响响应。在机器学习中，模型的输入变量是协变量。</p>
@@ -93,7 +93,7 @@
 <p>解决这类问题，只需要将神经网络的输出层单元数变成 4，即 $n^{[L]}=4=C$，第一个单元表示图片是小鸡的概率，第二个单元表示图片是小猫的概率，第三个单元表示图片是小狗的概率，第四个单元表示图片是其他的概率，输出向量 $\hat y$ 的维度为 (4,1).</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_2.3_16.png" alt=""></p>
 <h3 id="softmax-层的前向传播"><a href="#softmax-层的前向传播" class="headerlink" title="softmax 层的前向传播"></a>softmax 层的前向传播</h3><p>第 L 层为输出层，这一层也叫 softmax 层，这一层的运算如下：</p>
-<p>$z^{[L]}=W^{[L]}a^{[l-1]}+b^{[L]}  \  激活函数：\ t=e^{(z^{[L]})} \ \hat y = a^{[L]}=\frac{t}{\sum\limits _{i=1}^4 t_i},a^{[L]}_i=\frac{t_i}{\sum\limits _{i=1}^4 t_i}$  </p>
+<p>$z^{[L]}=W^{[L]}a^{[l-1]}+b^{[L]}  \\  激活函数：\\ t=e^{(z^{[L]})} \\ \hat y = a^{[L]}=\frac{t}{\sum\limits _{i=1}^4 t_i},a^{[L]}_i=\frac{t_i}{\sum\limits _{i=1}^4 t_i}$  </p>
 <ul>
 <li>$z^{[L]},t,\hat y$ 的维度都是 (4,1) 向量</li>
 <li>i 代表第 L 的第 i 个结点</li>

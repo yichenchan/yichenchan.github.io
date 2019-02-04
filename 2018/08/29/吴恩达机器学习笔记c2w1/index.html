@@ -165,7 +165,7 @@ W^{[l]}=(1-\frac{\alpha\lambda}{m})W^{[l]}-\alpha(正则化之前的dW^{[l]})</s
 <h3 id="梯度消失和梯度爆炸-vanishing-exploding-gradients"><a href="#梯度消失和梯度爆炸-vanishing-exploding-gradients" class="headerlink" title="梯度消失和梯度爆炸 (vanishing / exploding gradients)"></a>梯度消失和梯度爆炸 (vanishing / exploding gradients)</h3><p>梯度消失或爆炸指的是，当你在训练一个深度神经网络的时候，损失函数的导数或者说斜率，有时会变得非常大或者非常小甚至是呈指数级减小的一种现象。</p>
 <h4 id="为什么会发生梯度消失或梯度爆炸"><a href="#为什么会发生梯度消失或梯度爆炸" class="headerlink" title="为什么会发生梯度消失或梯度爆炸"></a>为什么会发生梯度消失或梯度爆炸</h4><p>有一个非常深的神经网络如下图所示：</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.1_21.png" alt=""></p>
-<p>假设激活函数为线性函数，即 $g(z)=z$，且 $b^{[l]}=0$，那么我们可以求出最终的预测值：$\hat y=W^{[1]}W^{[2]}W^{[3]}…W^{[L-1]}W^{[L]}X$，假设每个权重矩阵只比单位矩阵大一点点，例如 $W^{[l]}=\begin{bmatrix}<br>1.5 &amp; 0\ <br>0 &amp; 1.5<br>\end{bmatrix}$，那么 $\hat y = W^{[L]}{\begin{bmatrix}<br>1.5 &amp; 0\ <br>0 &amp; 1.5<br>\end{bmatrix}}^{L-1}X$，如果 L 很大即层数很深，那么激活函数值会呈指数级增长，最后的预测值发生爆炸。反之，如果每个权重矩阵只比单位矩阵小一点点，那么激活函数值会呈指数级减少，最后的预测值可能消失。同理，反向传播中的梯度也会在层数很大时指数级增长或者减少，这样会使得梯度下降变得非常非常慢。</p>
+<p>假设激活函数为线性函数，即 $g(z)=z$，且 $b^{[l]}=0$，那么我们可以求出最终的预测值：$\hat y=W^{[1]}W^{[2]}W^{[3]}…W^{[L-1]}W^{[L]}X$，假设每个权重矩阵只比单位矩阵大一点点，例如 $W^{[l]}=\begin{bmatrix}<br>1.5 &amp; 0\\<br>0 &amp; 1.5<br>\end{bmatrix}$，那么 $\hat y = W^{[L]}{\begin{bmatrix}<br>1.5 &amp; 0\\<br>0 &amp; 1.5<br>\end{bmatrix}}^{L-1}X$，如果 L 很大即层数很深，那么激活函数值会呈指数级增长，最后的预测值发生爆炸。反之，如果每个权重矩阵只比单位矩阵小一点点，那么激活函数值会呈指数级减少，最后的预测值可能消失。同理，反向传播中的梯度也会在层数很大时指数级增长或者减少，这样会使得梯度下降变得非常非常慢。</p>
 <h4 id="如何改善梯度消失或爆炸——参数初始化"><a href="#如何改善梯度消失或爆炸——参数初始化" class="headerlink" title="如何改善梯度消失或爆炸——参数初始化"></a>如何改善梯度消失或爆炸——参数初始化</h4><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl2.1_22.png" alt=""></p>
 <p>对于一个单神经元，如果我们忽略参数 b，那么 $z=w_1x_1+w_2x_2+…+w_nx_n$，我们不想让 z 变大或变小，如果 n 越大，那么 $w_i$ 就要越小，因为 z 是 n 个 $w_ix_i$ 的和，而 x 是不变的。一个解决办法是用方差为 $\frac{k}{n}$ 的正态分布初始化参数 w，其中 k 值取决于激活函数：</p>
 <ol>
@@ -199,7 +199,7 @@ f'(\theta)\approx\frac{f(\theta+\varepsilon)-f(\theta-\varepsilon)}{2\varepsilon
 <li><p>把 $dW^{[1]},db^{[1]},dW^{[2]},db^{[2]},…,dW^{[L]},db^{[L]}$ reshape 成一个大向量 $d\theta$</p>
 </li>
 <li><p>梯度检查算法：</p>
-<p> $for \quad each \quad  i:\  \quad \quad    d\theta_{approx}{[i]}=\frac{J(\theta_1,\theta_2,…,\theta_i+\varepsilon,…)-J(\theta_1,\theta_2,…,\theta_i-\varepsilon,…)}{2\varepsilon}\  \hspace{3.5cm} \approx d\theta[i]=\frac{\partial J}{\partial \theta_i}$</p>
+<p> $for \quad each \quad  i:\\  \quad \quad  \  d\theta_{approx}{[i]}=\frac{J(\theta_1,\theta_2,…,\theta_i+\varepsilon,…)-J(\theta_1,\theta_2,…,\theta_i-\varepsilon,…)}{2\varepsilon}\\  \hspace{3.5cm} \approx d\theta[i]=\frac{\partial J}{\partial \theta_i}$</p>
 <ul>
 <li>其中 $d\theta_{approx}[i]$ 指的用上面的公式计算的值，$d\theta[i]$ 指的是程序计算出的值</li>
 <li>$\theta[i]$ 指的是第 i 层的参数</li>

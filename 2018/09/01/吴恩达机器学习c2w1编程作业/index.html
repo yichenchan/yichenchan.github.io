@@ -34,7 +34,7 @@
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_code_2.1_5.png" alt=""></p>
 <p>分析：</p>
 <ul>
-<li>代价函数开始的值很高，是因为用很大的随机值初始化权重会使得最后的激活（sigmoid）输出值 $a^{[L]}$ 非常接近 0 或者 1，代价函数公式为$J = - \frac{1}{m} \sum\limits_{i = 0}^{m} \large{(} \small y^{(i)}\log\left(a^{[L] (i)}\right) + (1-y^{(i)})\log\left(1- a^{[L] (i)}\right) \large{)} \small$ ，当 $a^{<a href="i">L</a>}\approx0$ 时，$log(a^{<a href="i">L</a>})=log(0)\rightarrow$ 无穷大</li>
+<li>代价函数开始的值很高，是因为用很大的随机值初始化权重会使得最后的激活（sigmoid）输出值 $a^{[L]}$ 非常接近 0 或者 1，代价函数公式为$J = - \frac{1}{m} \sum\limits_{i = 0}^{m} \large{(} \small y^{(i)}\log\left(a^{[L] (i)}\right) + (1-y^{(i)})\log\left(1- a^{[L] (i)}\right) \large{)} \small$ ，当 $a^{[ L ] ( i )} \approx 0$ 时，$log(a^{[ L ] ( i )})= log( 0 ) \rightarrow$ 无穷大</li>
 <li>不好的初始化可能导致梯度消失/爆炸，这会减慢优化算法的速度</li>
 <li>如果训练上面的的网络更长时间，可以得到更好的结果，但是用大随机值初始化会减慢优化的速度</li>
 </ul>
