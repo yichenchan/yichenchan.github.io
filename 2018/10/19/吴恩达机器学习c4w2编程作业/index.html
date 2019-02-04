@@ -85,19 +85,19 @@
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_code_4.2_8.png" alt=""></p>
 <p>First component of main path: </p>
 <ul>
-<li>The first CONV2D has <script type="math/tex">F_1</script> filters of shape (1,1) and a stride of (1,1). Its padding is “valid” and its name should be <code>conv_name_base + &#39;2a&#39;</code>. Use 0 as the seed for the random initialization. </li>
+<li>The first CONV2D has $F_1$ filters of shape (1,1) and a stride of (1,1). Its padding is “valid” and its name should be <code>conv_name_base + &#39;2a&#39;</code>. Use 0 as the seed for the random initialization. </li>
 <li>The first BatchNorm is normalizing the channels axis.  Its name should be <code>bn_name_base + &#39;2a&#39;</code>.</li>
 <li>Then apply the ReLU activation function. This has no name and no hyperparameters. </li>
 </ul>
 <p>Second component of main path:</p>
 <ul>
-<li>The second CONV2D has <script type="math/tex">F_2</script> filters of shape <script type="math/tex">(f,f)</script> and a stride of (1,1). Its padding is “same” and its name should be <code>conv_name_base + &#39;2b&#39;</code>. Use 0 as the seed for the random initialization. </li>
+<li>The second CONV2D has $F_2$ filters of shape $(f,f)$ and a stride of (1,1). Its padding is “same” and its name should be <code>conv_name_base + &#39;2b&#39;</code>. Use 0 as the seed for the random initialization. </li>
 <li>The second BatchNorm is normalizing the channels axis.  Its name should be <code>bn_name_base + &#39;2b&#39;</code>.</li>
 <li>Then apply the ReLU activation function. This has no name and no hyperparameters. </li>
 </ul>
 <p>Third component of main path:</p>
 <ul>
-<li>The third CONV2D has <script type="math/tex">F_3</script> filters of shape (1,1) and a stride of (1,1). Its padding is “valid” and its name should be <code>conv_name_base + &#39;2c&#39;</code>. Use 0 as the seed for the random initialization. </li>
+<li>The third CONV2D has $F_3$ filters of shape (1,1) and a stride of (1,1). Its padding is “valid” and its name should be <code>conv_name_base + &#39;2c&#39;</code>. Use 0 as the seed for the random initialization. </li>
 <li>The third BatchNorm is normalizing the channels axis.  Its name should be <code>bn_name_base + &#39;2c&#39;</code>. Note that there is no ReLU activation function in this component. </li>
 </ul>
 <p>Final step: </p>
@@ -117,24 +117,24 @@
 <p>各层的细节：</p>
 <p>First component of main path:</p>
 <ul>
-<li>The first CONV2D has <script type="math/tex">F_1</script> filters of shape (1,1) and a stride of (s,s). Its padding is “valid” and its name should be <code>conv_name_base + &#39;2a&#39;</code>. </li>
+<li>The first CONV2D has $F_1$ filters of shape (1,1) and a stride of (s,s). Its padding is “valid” and its name should be <code>conv_name_base + &#39;2a&#39;</code>. </li>
 <li>The first BatchNorm is normalizing the channels axis.  Its name should be <code>bn_name_base + &#39;2a&#39;</code>.</li>
 <li>Then apply the ReLU activation function. This has no name and no hyperparameters. </li>
 </ul>
 <p>Second component of main path:</p>
 <ul>
-<li>The second CONV2D has <script type="math/tex">F_2</script> filters of (f,f) and a stride of (1,1). Its padding is “same” and it’s name should be <code>conv_name_base + &#39;2b&#39;</code>.</li>
+<li>The second CONV2D has $F_2$ filters of (f,f) and a stride of (1,1). Its padding is “same” and it’s name should be <code>conv_name_base + &#39;2b&#39;</code>.</li>
 <li>The second BatchNorm is normalizing the channels axis.  Its name should be <code>bn_name_base + &#39;2b&#39;</code>.</li>
 <li>Then apply the ReLU activation function. This has no name and no hyperparameters. </li>
 </ul>
 <p>Third component of main path:</p>
 <ul>
-<li>The third CONV2D has <script type="math/tex">F_3</script> filters of (1,1) and a stride of (1,1). Its padding is “valid” and it’s name should be <code>conv_name_base + &#39;2c&#39;</code>.</li>
+<li>The third CONV2D has $F_3$ filters of (1,1) and a stride of (1,1). Its padding is “valid” and it’s name should be <code>conv_name_base + &#39;2c&#39;</code>.</li>
 <li>The third BatchNorm is normalizing the channels axis.  Its name should be <code>bn_name_base + &#39;2c&#39;</code>. Note that there is no ReLU activation function in this component. </li>
 </ul>
 <p>Shortcut path:</p>
 <ul>
-<li>The CONV2D has <script type="math/tex">F_3</script> filters of shape (1,1) and a stride of (s,s). Its padding is “valid” and its name should be <code>conv_name_base + &#39;1&#39;</code>.</li>
+<li>The CONV2D has $F_3$ filters of shape (1,1) and a stride of (s,s). Its padding is “valid” and its name should be <code>conv_name_base + &#39;1&#39;</code>.</li>
 <li>The BatchNorm is normalizing the channels axis.  Its name should be <code>bn_name_base + &#39;1&#39;</code>. </li>
 </ul>
 <p>Final step: </p>

@@ -68,7 +68,7 @@
 <li><a href="http://andrew.gibiansky.com/blog/machine-learning/convolutional-neural-networks/" target="_blank" rel="noopener">参考2</a></li>
 <li><a href="https://www.cnblogs.com/pinard/p/6494810.html" target="_blank" rel="noopener">参考3</a></li>
 </ul>
-<p>在参考 1 中我们可以知道，<script type="math/tex">dA^{[l-1]}</script> 就是将 <script type="math/tex">dZ^{[l]}</script> 与翻转 180 度的过滤器矩阵进行卷积的结果，如下图所示：</p>
+<p>在参考 1 中我们可以知道，$dA^{[l-1]}$ 就是将 $dZ^{[l]}$ 与翻转 180 度的过滤器矩阵进行卷积的结果，如下图所示：</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_code_4.1_4.png" alt=""></p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_code_4.1_5.jpg" alt=""></p>
 <p>这正是下面式子所表示的，+= 就是将四个叠加起来，问题是下面的式子中的 W 并没有旋转 180 度……这点一直无法解释……</p>

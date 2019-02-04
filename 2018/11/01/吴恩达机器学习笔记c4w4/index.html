@@ -31,19 +31,19 @@
 </ul>
 <a id="more"></a>
 <h3 id="单样本学习-one-shot-learning"><a href="#单样本学习-one-shot-learning" class="headerlink" title="单样本学习 one-shot learning"></a>单样本学习 one-shot learning</h3><p>单样本学习指的是用<strong>一张</strong>样本照片进行学习，然后再次识别出这个人。由于只有一个样本，所以如果直接输入到 CNN 进行训练，效果非常不好。</p>
-<p>正确的做法是学习出一个“相似度”函数 <code>d(img1, img2)</code>，它等于两个图片的不同程度，如果 <script type="math/tex">d(img1, img2) \le \tau</script>，那么这两张图片就是一个人，如果反之，这不是一个人。</p>
+<p>正确的做法是学习出一个“相似度”函数 <code>d(img1, img2)</code>，它等于两个图片的不同程度，如果 $d(img1, img2) \le \tau$，那么这两张图片就是一个人，如果反之，这不是一个人。</p>
 <h3 id="孪生网络-Siamese-network"><a href="#孪生网络-Siamese-network" class="headerlink" title="孪生网络 Siamese network"></a>孪生网络 Siamese network</h3><p>[Taigman et. al., 2014. DeepFace closing the gap to human level performance] </p>
-<p>假设我们有两张图片 <script type="math/tex">x^{(1)}, x^{(2)}</script>，我们将它们通过一个卷积网络，输出两个编码向量 <script type="math/tex">f(x^{(1)})</script> 和 <script type="math/tex">f(x^{(2)})</script>，训练这个网络，使得我们确信这个编码是对这两张图片的良好表达，这个相似度函数就是两张照片的编码的差的范数。</p>
+<p>假设我们有两张图片 $x^{(1)}, x^{(2)}$，我们将它们通过一个卷积网络，输出两个编码向量 $f(x^{(1)})$ 和 $f(x^{(2)})$，训练这个网络，使得我们确信这个编码是对这两张图片的良好表达，这个相似度函数就是两张照片的编码的差的范数。</p>
 <script type="math/tex; mode=display">
 d(x^{(1)},x^{(2)})=||f(x^{(1)})-f(x^{(2)})||^2_2</script><p>这个概念被称作孪生网络。</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.4_1.png" alt=""></p>
 <p>如何训练？</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.4_2.png" alt=""></p>
 <ul>
-<li>神经网络的参数定义了图片的一个编码 <script type="math/tex">f(x^{(i)})</script></li>
+<li>神经网络的参数定义了图片的一个编码 $f(x^{(i)})$</li>
 <li>学习参数使得：<ul>
-<li>如果 <script type="math/tex">x^{(i)}</script> 和 <script type="math/tex">x^{(j)}</script> 是同一个人，那么 <script type="math/tex">||f(x^{(1)})-f(x^{(2)})||^2_2</script> 就很小</li>
-<li>如果 <script type="math/tex">x^{(i)}</script> 和 <script type="math/tex">x^{(j)}</script> 是不同的人，那么 <script type="math/tex">||f(x^{(1)})-f(x^{(2)})||^2_2</script> 就很大</li>
+<li>如果 $x^{(i)}$ 和 $x^{(j)}$ 是同一个人，那么 $||f(x^{(1)})-f(x^{(2)})||^2_2$ 就很小</li>
+<li>如果 $x^{(i)}$ 和 $x^{(j)}$ 是不同的人，那么 $||f(x^{(1)})-f(x^{(2)})||^2_2$ 就很大</li>
 </ul>
 </li>
 </ul>
@@ -53,17 +53,17 @@ d(x^{(1)},x^{(2)})=||f(x^{(1)})-f(x^{(2)})||^2_2</script><p>这个概念被称�
 <script type="math/tex; mode=display">
 d(A, P) \le d(A,N) \\
 ||f(A)-f(P)||^2 \le ||f(A)-f(N)||^2\\
-||f(A)-f(P)||^2 - ||f(A)-f(N)||^2 \le 0</script><p>但是为了防止神经网络把 f(A) 和 f(P) 和 f(N) 训练得特别接近，例如当它们都为 0 时，上式仍然满足，为了防止神经网络输出退化解，增大 d(A, P) 和 d(A, N) 之间的差距，我们增加一个超参数 margin <script type="math/tex">\alpha</script>，式子变成：</p>
+||f(A)-f(P)||^2 - ||f(A)-f(N)||^2 \le 0</script><p>但是为了防止神经网络把 f(A) 和 f(P) 和 f(N) 训练得特别接近，例如当它们都为 0 时，上式仍然满足，为了防止神经网络输出退化解，增大 d(A, P) 和 d(A, N) 之间的差距，我们增加一个超参数 margin $\alpha$，式子变成：</p>
 <script type="math/tex; mode=display">
 d(A, P) + \alpha \le d(A,N) \\
 ||f(A)-f(P)||^2 + \alpha  \le ||f(A)-f(N)||^2 \\
-||f(A)-f(P)||^2 - ||f(A)-f(N)||^2 + \alpha \le 0</script><p>当 d(A, P) = 0.5 时，加上 <script type="math/tex">\alpha</script> = 0.2，则 d(A, N) 至少为 0.7，使得 d(A, P) 远小于 d(A, N)。</p>
+||f(A)-f(P)||^2 - ||f(A)-f(N)||^2 + \alpha \le 0</script><p>当 d(A, P) = 0.5 时，加上 $\alpha$ = 0.2，则 d(A, N) 至少为 0.7，使得 d(A, P) 远小于 d(A, N)。</p>
 <h4 id="三元损失函数定义"><a href="#三元损失函数定义" class="headerlink" title="三元损失函数定义"></a>三元损失函数定义</h4><p>给定三个图片 A，P，N：</p>
 <script type="math/tex; mode=display">
 L(A,P,N)=max(||f(A)-f(P)||^2 - ||f(A)-f(N)||^2 + \alpha, \  0 )</script><p>总的代价函数为：</p>
 <script type="math/tex; mode=display">
 J = \sum\limits ^m_{i=1}L(A^{(i)},P^{(i)},N^{(i)})</script><p>我们必须保证每个人不止一张照片，假设训练集为 1000 个人的 10000 张照片，我们需要拿这 10000 张照片去生成上式的三元组。</p>
-<h4 id="如何选择三元组-A-P-N"><a href="#如何选择三元组-A-P-N" class="headerlink" title="如何选择三元组 A, P, N"></a>如何选择三元组 A, P, N</h4><p>在训练时，如果你随意选择 A，P，N，那么 <script type="math/tex">d(A, P) + \alpha \le d(A,N)</script> 这个式子会非常容易满足，因为如果随便挑的 d(A, P) 会有很大几率远小于 d(A, N)，这样导致神经网络无法从中学到东西。</p>
+<h4 id="如何选择三元组-A-P-N"><a href="#如何选择三元组-A-P-N" class="headerlink" title="如何选择三元组 A, P, N"></a>如何选择三元组 A, P, N</h4><p>在训练时，如果你随意选择 A，P，N，那么 $d(A, P) + \alpha \le d(A,N)$ 这个式子会非常容易满足，因为如果随便挑的 d(A, P) 会有很大几率远小于 d(A, N)，这样导致神经网络无法从中学到东西。</p>
 <p>我们需要做的是挑选那种<strong>很难训练</strong>的三元组，使得你挑的 A, P, N 会让 d(A,P) 很靠近 d(A,N)，这样使得算法在学习的时候要花更多的力气尝试让右边这一项增大，左边这项减小，也就是使得：</p>
 <script type="math/tex; mode=display">
 d(A, P)  \approx  d(A, N)</script><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.4_4.png" alt=""></p>
@@ -71,7 +71,7 @@ d(A, P)  \approx  d(A, N)</script><p><img src="https://raw.githubusercontent.com
 <h3 id="人脸识别的二元分类方法"><a href="#人脸识别的二元分类方法" class="headerlink" title="人脸识别的二元分类方法"></a>人脸识别的二元分类方法</h3><p>除了三元损失函数，我们还有其他的定义损失函数的方法。</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.4_5.png" alt=""></p>
 <script type="math/tex; mode=display">
-\hat y = \sigma (\sum\limits ^{128} _{k=1}w_i|f(x^{(i)})_k-f(x^{(j)})_k|+b)</script><p>还有一种变种 <script type="math/tex">\chi ^2</script> 相似度：</p>
+\hat y = \sigma (\sum\limits ^{128} _{k=1}w_i|f(x^{(i)})_k-f(x^{(j)})_k|+b)</script><p>还有一种变种 $\chi ^2$ 相似度：</p>
 <script type="math/tex; mode=display">
 \hat y = \sigma (\sum\limits ^{128} _{k=1}w_i \frac{(f(x^{(i)})_k-f(x^{(j)})_k)^2}{f(x^{(i)})_k+f(x^{(j)})_k}  +b)</script><p>一个小技巧是我们不必每次都计算数据库中的图片的编码值，我们可以先进行预计算，在进行识别时直接跟这些预计算的编码值进行比较，然后预测结果 y.</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.4_6.png" alt=""></p>
@@ -92,17 +92,17 @@ J(G)= \alpha J_{content}(C,G)+\beta J_{style}(S,G)</script><p><strong>如何生�
 </ul>
 </li>
 <li>使用梯度下降最小化 J(G) <ul>
-<li><script type="math/tex">G:=G- \frac{\partial J(G)}{\partial G}</script> 不同于更新权重，我们通过梯度下降更新 G 的像素值来最小化 J(G)</li>
+<li>$G:=G- \frac{\partial J(G)}{\partial G}$ 不同于更新权重，我们通过梯度下降更新 G 的像素值来最小化 J(G)</li>
 </ul>
 </li>
 </ul>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.4_10.png" alt=""></p>
 <h3 id="内容代价函数"><a href="#内容代价函数" class="headerlink" title="内容代价函数"></a>内容代价函数</h3><script type="math/tex; mode=display">
 J(G)= \alpha J_{content}(C,G)+\beta J_{style}(S,G)</script><ul>
-<li>假设使用 <script type="math/tex">l</script> 个隐藏层来计算内容代价函数</li>
+<li>假设使用 $l$ 个隐藏层来计算内容代价函数</li>
 <li>使用预训练的卷积网络，比如 VGG 网络</li>
-<li>分别将内容图片 C 和生成图片 G 输入这个网络，假设 <script type="math/tex">a ^ { [ l ] ( C ) }</script> 和 <script type="math/tex">a ^ { [ l ] ( G ) }</script> 分别是第 <script type="math/tex">l</script> 层的内容图像 C 和生成图片 G 的<strong>激活值</strong></li>
-<li>如果 <script type="math/tex">a ^ { [ l ] ( C ) }</script> 和 <script type="math/tex">a ^ { [ l ] ( G ) }</script> 很接近，那么两张图片就有相似的内容，所以内容代价函数为：</li>
+<li>分别将内容图片 C 和生成图片 G 输入这个网络，假设 $a ^ { [ l ] ( C ) }$ 和 $a ^ { [ l ] ( G ) }$ 分别是第 $l$ 层的内容图像 C 和生成图片 G 的<strong>激活值</strong></li>
+<li>如果 $a ^ { [ l ] ( C ) }$ 和 $a ^ { [ l ] ( G ) }$ 很接近，那么两张图片就有相似的内容，所以内容代价函数为：</li>
 </ul>
 <script type="math/tex; mode=display">
 J_{content}(C,G) = \frac{1}{2}||a ^ { [ l ] ( C ) } - a ^ { [ l ] ( G ) }||^2</script><h3 id="风格代价函数"><a href="#风格代价函数" class="headerlink" title="风格代价函数"></a>风格代价函数</h3><h4 id="如何定义一张图片的“风格”"><a href="#如何定义一张图片的“风格”" class="headerlink" title="如何定义一张图片的“风格”"></a>如何定义一张图片的“风格”</h4><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.4_11.png" alt=""></p>
@@ -111,8 +111,8 @@ J_{content}(C,G) = \frac{1}{2}||a ^ { [ l ] ( C ) } - a ^ { [ l ] ( G ) }||^2</s
 <p>假设红色通道表示红框框起来的特征（那些竖条纹），黄色通道表示黄框框起来的特征（即那些橘红色的图块），那么，红色通道和黄色通道的相关性，可以告诉你在图片中这种竖条纹和橘色图块是否经常同时出现，这是“风格”的一种衡量方式。</p>
 <h4 id="风格矩阵"><a href="#风格矩阵" class="headerlink" title="风格矩阵"></a>风格矩阵</h4><p>我们需要过给定的图像计算出风格矩阵，风格矩阵会记录上一张幻灯片中我们提到的所有相关性。</p>
 <ul>
-<li><script type="math/tex">a^{[l]}_{i,j,k}</script> 是第 <script type="math/tex">l</script> 层在（i, j, k）这个位置的激活值，i 是高度，j 是宽度，k 是通道</li>
-<li><script type="math/tex">G^{[l]}</script> 是形状为 <script type="math/tex">n^{[l]}_c×n^{[l]}_c</script> 的风格矩阵，<script type="math/tex">n^{[l]}_c</script> 是第 l 层的通道数</li>
+<li>$a^{[l]}_{i,j,k}$ 是第 $l$ 层在（i, j, k）这个位置的激活值，i 是高度，j 是宽度，k 是通道</li>
+<li>$G^{[l]}$ 是形状为 $n^{[l]}_c×n^{[l]}_c$ 的风格矩阵，$n^{[l]}_c$ 是第 l 层的通道数</li>
 </ul>
 <script type="math/tex; mode=display">
 风格图片的风格矩阵 \ G^{[l](S)}_{kk'}=\sum\limits^{n^{[l]}_H}_{i=1}\sum\limits^{n^{[l]}_W}_{j=1}a^{[l](S)}_{i,j,k}a^{[l](S)}_{i,j,k'}</script><script type="math/tex; mode=display">
@@ -122,12 +122,12 @@ J_{content}(C,G) = \frac{1}{2}||a ^ { [ l ] ( C ) } - a ^ { [ l ] ( G ) }||^2</s
 </ul>
 <h4 id="风格代价函数-1"><a href="#风格代价函数-1" class="headerlink" title="风格代价函数"></a>风格代价函数</h4><script type="math/tex; mode=display">
 J _ { \text { style } } ^ { [ l ] } ( S , G ) =\frac { 1 } { \left( 2 n _ { H } ^ { [ l ] } n _ { W } ^ { [ l ] } n _ { C } ^ { [ l ] } \right) ^ { 2 } }||G^{[l](S)}-G^{[l](G)}||^2_F \\ = \frac { 1 } { \left( 2 n _ { H } ^ { [ l ] } n _ { W } ^ { [ l ] } n _ { C } ^ { [ l ] } \right) ^ { 2 } } \sum _ { k } \sum _ { k ^ { \prime } } \left( G _ { k k ^ { \prime } } ^ { [ l ] ( S ) } - G _ { k k ^ { \prime } } ^ { [ l ] ( G ) } \right)^2</script><ul>
-<li><script type="math/tex">\frac { 1 } { \left( 2 n _ { H } ^ { [ l ] } n _ { W } ^ { [ l ] } n _ { C } ^ { [ l ] } \right) ^ { 2 } }</script> 是不重要的标准化系数</li>
+<li>$\frac { 1 } { \left( 2 n _ { H } ^ { [ l ] } n _ { W } ^ { [ l ] } n _ { C } ^ { [ l ] } \right) ^ { 2 } }$ 是不重要的标准化系数</li>
 </ul>
 <p>如果我们需要将不同层的风格代价函数都考虑进去，那么式子变成：</p>
 <script type="math/tex; mode=display">
 J _ { \text { style } } ( S , G ) = \sum\limits _l \lambda^{[l]}J _ { \text { style } } ^ { [ l ] } ( S , G )</script><ul>
-<li><script type="math/tex">\lambda</script> 为一个可调整的超参数</li>
+<li>$\lambda$ 为一个可调整的超参数</li>
 </ul>
 <h2 id="1D-和-3D-卷积"><a href="#1D-和-3D-卷积" class="headerlink" title="1D 和 3D 卷积"></a>1D 和 3D 卷积</h2><h3 id="2D-到-1D-的推广"><a href="#2D-到-1D-的推广" class="headerlink" title="2D 到 1D 的推广"></a>2D 到 1D 的推广</h3><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.4_13.png" alt=""></p>
 <h3 id="2D-到-3D-的推广"><a href="#2D-到-3D-的推广" class="headerlink" title="2D 到 3D 的推广"></a>2D 到 3D 的推广</h3><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.4_14.png" alt=""></p>

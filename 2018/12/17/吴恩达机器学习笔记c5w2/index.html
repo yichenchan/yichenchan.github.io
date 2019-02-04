@@ -39,11 +39,11 @@
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_4.png" alt=""></p>
 <p>在词向量空间中，代表 man 的这个词的词向量和代表 woman 这个词的词向量之间的距离与 king 向量和 queen 向量之间的距离近似相等，如下图所示：</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_5.png" alt=""></p>
-<p>要找到和 man -&gt; woman 类似的一对词 king -&gt; ?，我们可以遍历所有词向量，找到这么一个词 w 满足：<script type="math/tex">sim(e_w,e_{king}-e_{man}+e_{woman})</script> 最大，其中 sim() 是 “cosine 相似度”。</p>
+<p>要找到和 man -&gt; woman 类似的一对词 king -&gt; ?，我们可以遍历所有词向量，找到这么一个词 w 满足：$sim(e_w,e_{king}-e_{man}+e_{woman})$ 最大，其中 sim() 是 “cosine 相似度”。</p>
 <script type="math/tex; mode=display">
 sim(u,v)=\frac{u^Tv}{||u||_2||v||_2}</script><p>它其实表示的是向量 u 和 v 之间的 cos 值，cos 值越大表示两者夹角越小，相似度越大。</p>
-<p>另外 <script type="math/tex">||u-v||^2</script> 也可以表示两者的相似度。</p>
-<h3 id="嵌入矩阵-Embedding-matrix"><a href="#嵌入矩阵-Embedding-matrix" class="headerlink" title="嵌入矩阵 Embedding matrix"></a>嵌入矩阵 Embedding matrix</h3><p>当实现一个算法来学习字嵌入时，最终学习到的是一个嵌入矩阵 E，这个矩阵乘上某个词（例如位于 6257 位的 orange ）的 one-hot 向量（<script type="math/tex">o_{6257}</script>）得到它的词向量（<script type="math/tex">e_{6257}</script>），即：</p>
+<p>另外 $||u-v||^2$ 也可以表示两者的相似度。</p>
+<h3 id="嵌入矩阵-Embedding-matrix"><a href="#嵌入矩阵-Embedding-matrix" class="headerlink" title="嵌入矩阵 Embedding matrix"></a>嵌入矩阵 Embedding matrix</h3><p>当实现一个算法来学习字嵌入时，最终学习到的是一个嵌入矩阵 E，这个矩阵乘上某个词（例如位于 6257 位的 orange ）的 one-hot 向量（$o_{6257}$）得到它的词向量（$e_{6257}$），即：</p>
 <script type="math/tex; mode=display">
 E·o_j=e_j</script><p>其中 E 代表 Embedding 矩阵，o 代表 one-hot 向量，e 代表 embedding 向量。</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_6.png" alt=""></p>
@@ -68,9 +68,10 @@ E·o_j=e_j</script><p>其中 E 代表 Embedding 矩阵，o 代表 one-hot 向量
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_9.png" alt=""></p>
 <p>来自博客 <a href="https://blog.csdn.net/wangyangzhizhou/article/details/77530479" target="_blank" rel="noopener">seaboat</a> 的一张图片：<img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_20.png" alt=""></p>
 <h4 id="model-details"><a href="#model-details" class="headerlink" title="model details"></a>model details</h4><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_10.png" alt=""></p>
-<script type="math/tex; mode=display">o_c \rightarrow 乘上E \rightarrow e_c \rightarrow softmax(W·e_c+b) \rightarrow \hat y</script><p>其中 $W = \begin{bmatrix}<br>\theta_1^T\\<br>\theta_2^T\\<br>…\\<br>\theta_{10000}^T<br>\end{bmatrix}$ </p>
+<p>$o_c \rightarrow 乘上E \rightarrow e_c \rightarrow softmax(W·e_c+b) \rightarrow \hat y$</p>
+<p>其中 $W = \begin{bmatrix}<br>\theta_1^T\ <br>\theta_2^T\ <br>…\ <br>\theta_{10000}^T<br>\end{bmatrix}$ </p>
 <h4 id="用-softmax-进行分类的问题"><a href="#用-softmax-进行分类的问题" class="headerlink" title="用 softmax 进行分类的问题"></a>用 softmax 进行分类的问题</h4><script type="math/tex; mode=display">
-\hat y _t = p ( t | c ) = \frac { e ^ { \theta _ { t } ^ { T } e _ { c } } } { \sum _ { j = 1 } ^ { 10,000 } e ^ { \theta _ { j } ^ { T } e _ { c } } }</script><p>其中 <script type="math/tex">\theta_j</script> 是 softmax 层的参数 W 的第 j 行，<script type="math/tex">\theta_t</script> 是 W 中与输出有关的那一行。</p>
+\hat y _t = p ( t | c ) = \frac { e ^ { \theta _ { t } ^ { T } e _ { c } } } { \sum _ { j = 1 } ^ { 10,000 } e ^ { \theta _ { j } ^ { T } e _ { c } } }</script><p>其中 $\theta_j$ 是 softmax 层的参数 W 的第 j 行，$\theta_t$ 是 W 中与输出有关的那一行。</p>
 <p>softmax 层存在的问题是：我们需要进行 10000 次加法，这会非常非常慢！！解决的办法是使用一种“分级 softmax”分类器 (hierarchical softmax classifier)。</p>
 <h4 id="如何选择-context-c"><a href="#如何选择-context-c" class="headerlink" title="如何选择 context c"></a>如何选择 context c</h4><p>我们必须先选择好 context c，再在窗内随机选择 target t，那么如何选择 c？</p>
 <p>一种办法是随机均匀地在文本中采样，但是问题是这样会采样进许多被频繁使用的词，比如 of the a an 等等，导致我们浪费时间在这些常用词的词嵌入上，所以我们需要在采样的时候适当地剔除这些词，实现常用词和不常用词的平衡。</p>
@@ -81,23 +82,24 @@ E·o_j=e_j</script><p>其中 E 代表 Embedding 矩阵，o 代表 one-hot 向量
 <li>对于大数据集：k = 2～5</li>
 </ul>
 <h4 id="算法细节"><a href="#算法细节" class="headerlink" title="算法细节"></a>算法细节</h4><p>我们知道上面的 Word2Vec 算法步骤为：</p>
-<script type="math/tex; mode=display">o_c \rightarrow E \rightarrow e_c \rightarrow softmax(W·e_c+b) \rightarrow one-hot向量\hat y</script><p> 其中 <script type="math/tex">W = \begin{bmatrix}\theta_1^T\\ \theta_2^T\\ ...\\ \theta_{10000}^T\end{bmatrix}</script>，<script type="math/tex">\hat y _t = p ( t | c ) = \frac { e ^ { \theta _ { t } ^ { T } e _ { c } } } { \sum _ { j = 1 } ^ { 10,000 } e ^ { \theta _ { j } ^ { T } e _ { c } } }</script> </p>
-<p>而负采样算法去掉 softmax 的步骤，改为对 <script type="math/tex">e_c​</script> 进行 10000 次逻辑回归：</p>
+<p>$o_c \rightarrow E \rightarrow e_c \rightarrow softmax(W·e_c+b) \rightarrow one-hot向量\hat y$</p>
+<p> 其中 $W = \begin{bmatrix}\theta_1^T\  \theta_2^T\ …\ \theta_{10000}^T\end{bmatrix}，\hat y _t = p ( t | c ) = \frac { e ^ { \theta _ { t } ^ { T } e _ { c } } } { \sum _ { j = 1 } ^ { 10,000 } e ^ { \theta _ { j } ^ { T } e _ { c } } }$ </p>
+<p>而负采样算法去掉 softmax 的步骤，改为对 $e_c$ 进行 10000 次逻辑回归：</p>
 <script type="math/tex; mode=display">
 P(y=1|c,t)=sigmoid(\theta_t^Te_c)</script><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_12.png" alt=""></p>
 <p>在实际中，我们只训练其中的 k+1 个逻辑回归模型，即训练 1 个正样本和 k 个负样本的逻辑回归模型，这样使得我们不用计算 10000 元分类的 softmax 层，大大减少计算量。</p>
 <h4 id="如何抽取负样本？"><a href="#如何抽取负样本？" class="headerlink" title="如何抽取负样本？"></a>如何抽取负样本？</h4><p>算法作者 Mikolov 认为，最好的方法是介于根据经验分布的采样和均匀分布的采样之间，他们所做的是根据词频的 3/4 次幂来抽样。</p>
 <script type="math/tex; mode=display">
-P(w_i)=\frac{f^{\frac{3}{4}}(w_i)}{\sum^{10000}_{j=1}f^{\frac{3}{4}}(w_j)}</script><p>其中 <script type="math/tex">f^(w_i)</script> 表示观察到的英语中某个词的词频。</p>
-<h3 id="GloVe-词向量-global-vector"><a href="#GloVe-词向量-global-vector" class="headerlink" title="GloVe 词向量 (global vector )"></a>GloVe 词向量 (global vector )</h3><p>首先我们有一个目标词 i，还有一个上下文词 j，那么用 <script type="math/tex">X_{ij}</script> 表示 i 出现在 j 的上下文的次数，一般来说，<script type="math/tex">X_{ij}=X_{ji}</script> ，也就是说它表示 i 和 j 共同出现在一个上下文的次数，或者说<strong>彼此接近的频繁程度</strong>，可以遍历语料库数出来。</p>
+P(w_i)=\frac{f^{\frac{3}{4}}(w_i)}{\sum^{10000}_{j=1}f^{\frac{3}{4}}(w_j)}</script><p>其中 $f^(w_i)$ 表示观察到的英语中某个词的词频。</p>
+<h3 id="GloVe-词向量-global-vector"><a href="#GloVe-词向量-global-vector" class="headerlink" title="GloVe 词向量 (global vector )"></a>GloVe 词向量 (global vector )</h3><p>首先我们有一个目标词 i，还有一个上下文词 j，那么用 $X_{ij}$ 表示 i 出现在 j 的上下文的次数，一般来说，$X_{ij}=X_{ji}$ ，也就是说它表示 i 和 j 共同出现在一个上下文的次数，或者说<strong>彼此接近的频繁程度</strong>，可以遍历语料库数出来。</p>
 <p>GloVe 算法就是实现以下的优化问题：</p>
 <script type="math/tex; mode=display">
 minimize \sum\limits_{i=1}^{10000}\sum\limits_{j=1}^{10000} f(X_{ij})(\theta_i^T e_{j} + b_i+b'_j -logX_{ij})^2</script><p>其中：</p>
 <ul>
 <li>10000 是词汇表的个数，遍历整个词汇表</li>
-<li><script type="math/tex">\theta、b_i、b'_j</script> 都是待学习的参数</li>
-<li>为了防止出现 <script type="math/tex">log0</script> 无意义的情况，加上权重值 <script type="math/tex">f(x_{ij})</script>，当 <script type="math/tex">X_{ij}=0</script> 时，<script type="math/tex">f(x_{ij})=0</script>，定义 <script type="math/tex">0log0=0</script>，另外权重函数可以使得对“榴莲”这种较少出现的词给出不太小的权重，给“of the an”等常见的词给出不太大的权重</li>
-<li>一个有趣的事实是：<script type="math/tex">\theta_i</script> 和 <script type="math/tex">e_j</script> 是对称的，也就是说它们两者互为参数，起到的作用是相同的，所以我们最后学习到的参数可以是这两者的平均值，即 <script type="math/tex">e_w^{(final)}=\frac{e_w+\theta_w}{2}</script> </li>
+<li>$\theta、b_i、b’_j$ 都是待学习的参数</li>
+<li>为了防止出现 $log0$ 无意义的情况，加上权重值 $f(x_{ij})$，当 $X_{ij}=0$ 时，$f(x_{ij})=0$，定义 $0log0=0$，另外权重函数可以使得对“榴莲”这种较少出现的词给出不太小的权重，给“of the an”等常见的词给出不太大的权重</li>
+<li>一个有趣的事实是：$\theta_i $ 和 $e_j$ 是对称的，也就是说它们两者互为参数，起到的作用是相同的，所以我们最后学习到的参数可以是这两者的平均值，即 $e_w^{(final)}=\frac{e_w+\theta_w}{2}$ </li>
 </ul>
 <h2 id="词嵌入的应用"><a href="#词嵌入的应用" class="headerlink" title="词嵌入的应用"></a>词嵌入的应用</h2><h3 id="情感分类"><a href="#情感分类" class="headerlink" title="情感分类"></a>情感分类</h3><p>情感分类的任务是分析一段文本，告诉人们某个人是不是喜欢他们正在谈论的东西 。它是自然语言处理最重要的组成部分，有许多应用。情感分类的挑战之一是可能缺乏一个特别大的标签训练集，不过使用词嵌入后，依靠一个中等大小的标签训练集也可以构建出一个很好的情感分类器。</p>
 <p>假设有一些顾客对一家酒店的评价和这些顾客打出的星级，如下图所示：</p>
@@ -112,7 +114,7 @@ minimize \sum\limits_{i=1}^{10000}\sum\limits_{j=1}^{10000} f(X_{ij})(\theta_i^T
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_16.png" alt=""></p>
 <ul>
 <li><p>第一步：确定偏差的方向</p>
-<p>假设词向量中只有一个维度是表示性别偏差的方向，那么 <script type="math/tex">e_{he}-e_{she}</script> 、<script type="math/tex">e_{male}-e_{female}​</script>……然后将这些差值取平均，那么这个平均值向量就是表示偏差轴的向量，也就是偏差的方向。但是实际中使用了更复杂的 SVU 算法（一种类似于 PCA 主成份分析的算法）来确定偏差方向。</p>
+<p>假设词向量中只有一个维度是表示性别偏差的方向，那么 $e_{he}-e_{she}$ 、$e_{male}-e_{female}​$……然后将这些差值取平均，那么这个平均值向量就是表示偏差轴的向量，也就是偏差的方向。但是实际中使用了更复杂的 SVU 算法（一种类似于 PCA 主成份分析的算法）来确定偏差方向。</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_5.2_17.png" alt=""></p>
 </li>
 <li><p>第二步是中立化（Neutralize）：对于没有性别定义的词例如 doctor 或者 babysitter，通过将它们映射到非偏差轴摆脱偏差，如下图所示。那么那些词需要中立化？作者训练一个分类器来研究这个问题，得出的结论是大部分的英语单词都需要中立化，除了那些有性别定义的一小部分词语。</p>

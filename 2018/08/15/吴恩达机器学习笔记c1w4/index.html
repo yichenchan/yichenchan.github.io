@@ -20,23 +20,23 @@
 <h3 id="神经网络的符号含义"><a href="#神经网络的符号含义" class="headerlink" title="神经网络的符号含义"></a>神经网络的符号含义</h3><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl4.2.png" alt=""></p>
 <ul>
 <li><strong>l</strong> —— 表示神经网络的层数</li>
-<li><script type="math/tex; mode=display">n^{[l]}$$  表示 l 层的单元数，图中 $$n^{[0]}=n_x=3,n^{[1]}=5,n^{[2]}=5,n^{[3]}=3,n^{[4]}=n^{[l]}=1</script></li>
-<li><script type="math/tex">a^{[l]}=g^{[l]}(z^{[l]})</script> 表示 l 层的激活向量</li>
-<li><script type="math/tex">W^{[l]}</script> 表示产生 l 层的权重</li>
-<li><script type="math/tex">b^{[l]}</script> 表示产生 l 层的偏差</li>
+<li>$n^{[l]}$  表示 l 层的单元数，图中 $n^{[0]}=n_x=3,n^{[1]}=5,n^{[2]}=5,n^{[3]}=3,n^{[4]}=n^{[l]}=1$</li>
+<li>$a^{[l]}=g^{[l]}(z^{[l]})$ 表示 l 层的激活向量</li>
+<li>$W^{[l]}$ 表示产生 l 层的权重</li>
+<li>$b^{[l]}$ 表示产生 l 层的偏差</li>
 </ul>
 <h3 id="为什么我们需要“深度”"><a href="#为什么我们需要“深度”" class="headerlink" title="为什么我们需要“深度”"></a>为什么我们需要“深度”</h3><h4 id="例子1-——-面部识别"><a href="#例子1-——-面部识别" class="headerlink" title="例子1 —— 面部识别"></a>例子1 —— 面部识别</h4><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl4.3.png" alt=""></p>
 <p>神经网络的第一层可以被认为是一个边缘检测器，这一层的神经元正试图找到人脸的边缘在哪里，通过将像素分组的方法形成边缘，然后取消边缘检测，并将边缘组合在一起，形成面部的一部分，最后将面部的不同部位组合在一起我们可以识别不同的面部，我们可以将神经网络的浅层当作简单的检测函数，然后后一层将他们组合在一起，以便我们可以学习更复杂的功能</p>
 <h4 id="例子2-——-电路理论"><a href="#例子2-——-电路理论" class="headerlink" title="例子2 —— 电路理论"></a>例子2 —— 电路理论</h4><p>用一个隐藏神经元数量较少但是具有深度的神经网络来计算某些函数时，如果我们尝试用浅层神经网络来计算同样的函数，则需要指数级的隐藏神经元来进行计算。</p>
 <h2 id="建立深度神经网络的基本框架"><a href="#建立深度神经网络的基本框架" class="headerlink" title="建立深度神经网络的基本框架"></a>建立深度神经网络的基本框架</h2><h3 id="框架的建立过程"><a href="#框架的建立过程" class="headerlink" title="框架的建立过程"></a>框架的建立过程</h3><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl4.4.png" alt=""></p>
 <p>假设方框中的隐藏层为第 l 层：</p>
-<p>参数：<script type="math/tex">W^{[l]},b^{[l]}</script></p>
-<p>前向传播：输入 <script type="math/tex">a^{[l-1]}</script> ，输出 <script type="math/tex">a^{[l]}</script>，缓存 <script type="math/tex">z^{[l]}</script></p>
-<p>反向传播：输入 <script type="math/tex">da^{[l]}</script> 和缓存 <script type="math/tex">z^{[l]}</script>，输出 <script type="math/tex">da^{[l-1]}</script>，<script type="math/tex">dW^{[l]}</script>，<script type="math/tex">db^{[l]}</script></p>
+<p>参数：$W^{[l]},b^{[l]}$</p>
+<p>前向传播：输入 $a^{[l-1]}$ ，输出 $a^{[l]}$，缓存 $z^{[l]}$</p>
+<p>反向传播：输入 $da^{[l]}$ 和缓存 $z^{[l]}$，输出 $da^{[l-1]}$，$dW^{[l]}$，$db^{[l]}$</p>
 <p>画成框图如下所示：</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl4.5.png" alt=""></p>
 <h3 id="总体框架"><a href="#总体框架" class="headerlink" title="总体框架"></a>总体框架</h3><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl4.6.png" alt=""></p>
-<h2 id="前向传播"><a href="#前向传播" class="headerlink" title="前向传播"></a>前向传播</h2><h3 id="公式"><a href="#公式" class="headerlink" title="公式"></a>公式</h3><p>输入 <script type="math/tex">a^{[l-1]}</script> ，输出 <script type="math/tex">a^{[l]}</script>，缓存 <script type="math/tex">z^{[l]}</script></p>
+<h2 id="前向传播"><a href="#前向传播" class="headerlink" title="前向传播"></a>前向传播</h2><h3 id="公式"><a href="#公式" class="headerlink" title="公式"></a>公式</h3><p>输入 $a^{[l-1]}$ ，输出 $a^{[l]}$，缓存 $z^{[l]}$</p>
 <ol>
 <li><p>非向量化</p>
 <script type="math/tex; mode=display">
@@ -48,17 +48,20 @@ Z^{[l]}=W^{[l]}A^{[a-1]}+b^{[l]}\\
 A^{[l]}=g^{[l]}(Z^{[l]})</script></li>
 </ol>
 <blockquote>
-<script type="math/tex; mode=display">X=A^{[0]} → A^{[1]}→A^{[2]}→...→ A^{[l]}</script></blockquote>
+<p>$X=A^{[0]} → A^{[1]}→A^{[2]}→…→ A^{[l]}$ </p>
+</blockquote>
 <h3 id="维度的确定"><a href="#维度的确定" class="headerlink" title="维度的确定"></a>维度的确定</h3><p>有如下的一个5层的神经网络：</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl4.7!.png" alt=""></p>
 <p>对于单个训练样本：</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl4.8.png" alt=""></p>
-<script type="math/tex; mode=display">z^{[l]},dz^{[l]},a^{[l]},da^{[l]}:(n^{[l]},1)\\W^{[l]},dW^{[l]}:(n^{[l]},n^{[l-1]})\\b^{[l]},db^{[l]}:(n^{[l]},1)</script><p>对于多个训练样本：</p>
+<p>$z^{[l]},dz^{[l]},a^{[l]},da^{[l]}:(n^{[l]},1)\\W^{[l]},dW^{[l]}:(n^{[l]},n^{[l-1]})\\b^{[l]},db^{[l]}:(n^{[l]},1)$</p>
+<p>对于多个训练样本：</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl4.9.png" alt=""></p>
-<script type="math/tex; mode=display">Z^{[l]},dZ^{[l]},A^{[l]},dA^{[l]}:(n^{[l]},m)\\W^{[l]},dW^{[l]}:(n^{[l]},n^{[l-1]})\\b^{[l]},db^{[l]}:(n^{[l]},1)</script><blockquote>
-<p>其中 <script type="math/tex">l=0</script> 时，<script type="math/tex">A^{[0]}=X=(n^{[0]},m)</script></p>
+<p>$ Z^{[l]},dZ^{[l]},A^{[l]},dA^{[l]}:(n^{[l]},m)\\W^{[l]},dW^{[l]}:(n^{[l]},n^{[l-1]})\\b^{[l]},db^{[l]}:(n^{[l]},1)$</p>
+<blockquote>
+<p>其中 $l=0$ 时，$A^{[0]}=X=(n^{[0]},m)$</p>
 </blockquote>
-<h2 id="反向传播"><a href="#反向传播" class="headerlink" title="反向传播"></a>反向传播</h2><h3 id="公式-1"><a href="#公式-1" class="headerlink" title="公式"></a>公式</h3><p>输入 <script type="math/tex">da^{[l]}</script> 和缓存 <script type="math/tex">z^{[l]}</script>，输出 <script type="math/tex">da^{[l-1]}</script>，<script type="math/tex">dW^{[l]}</script>，<script type="math/tex">db^{[l]}</script></p>
+<h2 id="反向传播"><a href="#反向传播" class="headerlink" title="反向传播"></a>反向传播</h2><h3 id="公式-1"><a href="#公式-1" class="headerlink" title="公式"></a>公式</h3><p>输入 $da^{[l]}$ 和缓存 $z^{[l]}$，输出 $da^{[l-1]}$，$dW^{[l]}$，$db^{[l]}$</p>
 <ol>
 <li><p>非向量化</p>
 <script type="math/tex; mode=display">
@@ -75,8 +78,8 @@ dW^{[l]}=\frac{1}{m}dZ^{[l]}A^{[l-1]T}\\
 db^{[l]}=\frac{1}{m}np.sum(dZ^{[l]},axis=1,keepdims=True)\\
 dA^{[l-1]}=W^{[l]T}dZ^{[l]}</script></li>
 </ol>
-<h2 id="参数-parameters-与超参数-hyperparameters"><a href="#参数-parameters-与超参数-hyperparameters" class="headerlink" title="参数 (parameters) 与超参数 (hyperparameters)"></a>参数 (parameters) 与超参数 (hyperparameters)</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>什么是参数：<script type="math/tex">W^{[1]},b^{[1]},W^{[2]},b^{[2]},W^{[3]},b^{[3]}...</script> </p>
-<p>什么是<strong>超参数</strong>：学习率 (learning rate) <script type="math/tex">\alpha</script> ，迭代次数 (iterations)，隐藏层数 (hidden layers) L，隐藏单元数 (hidden units) <script type="math/tex">n^{[1]},n^{[2]}...</script> ，激活函数 (activation function) 的选择，动量，最小批大小，各种形式的正则化参数等等，由于这些参数都会影响参数 W 和 b 的最终结果，所以我们称之为<strong>超参数</strong></p>
+<h2 id="参数-parameters-与超参数-hyperparameters"><a href="#参数-parameters-与超参数-hyperparameters" class="headerlink" title="参数 (parameters) 与超参数 (hyperparameters)"></a>参数 (parameters) 与超参数 (hyperparameters)</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>什么是参数：$W^{[1]},b^{[1]},W^{[2]},b^{[2]},W^{[3]},b^{[3]}…$ </p>
+<p>什么是<strong>超参数</strong>：学习率 (learning rate) $\alpha$ ，迭代次数 (iterations)，隐藏层数 (hidden layers) L，隐藏单元数 (hidden units) $n^{[1]},n^{[2]}…$ ，激活函数 (activation function) 的选择，动量，最小批大小，各种形式的正则化参数等等，由于这些参数都会影响参数 W 和 b 的最终结果，所以我们称之为<strong>超参数</strong></p>
 <h3 id="深度学习是一个基于试验的过程"><a href="#深度学习是一个基于试验的过程" class="headerlink" title="深度学习是一个基于试验的过程"></a>深度学习是一个基于试验的过程</h3><p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl4.10.png" alt=""></p>
 <h3 id="深度学习和大脑有什么关系"><a href="#深度学习和大脑有什么关系" class="headerlink" title="深度学习和大脑有什么关系"></a>深度学习和大脑有什么关系</h3><p>吴恩达：深度学习和大脑相似度并不高，但深度学习和大脑的确有某些可以对比的地方，如下图，但是人脑中的神经元是如何进行学习的还是一个迷，而且至今我们还不清楚到底人脑中有没有一个类似于反向传播或者梯度下降的算法</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl4.11.png" alt=""></p>

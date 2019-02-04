@@ -97,8 +97,8 @@
 <blockquote>
 <p>分布相同：</p>
 <ul>
-<li>训练集 <script type="math/tex">\leftrightarrow</script> 训练-开发集</li>
-<li>开发集 <script type="math/tex">\leftrightarrow</script> 测试集</li>
+<li>训练集 $\leftrightarrow$ 训练-开发集</li>
+<li>开发集 $\leftrightarrow$ 测试集</li>
 </ul>
 </blockquote>
 <p>划分好之后，计算出模型在如下各个数据集上的误差如下表：</p>
@@ -146,18 +146,18 @@
 </ul>
 <h4 id="train-sets-和-dev-test-sets-不匹配问题的通用的解决方案"><a href="#train-sets-和-dev-test-sets-不匹配问题的通用的解决方案" class="headerlink" title="train sets 和 dev/test sets 不匹配问题的通用的解决方案"></a>train sets 和 dev/test sets 不匹配问题的通用的解决方案</h4><p>一个模型可能的误差类型：</p>
 <ul>
-<li><p><strong>人类误差</strong> (训练集分布)  <script type="math/tex"><\overset{\text{反映了不同分布的识别难度大小}}{===========}></script> 人类误差 (开发集分布) </p>
-<p><script type="math/tex">\Updownarrow</script> 反映可避免偏差</p>
+<li><p><strong>人类误差</strong> (训练集分布)  $&lt;\overset{\text{反映了不同分布的识别难度大小}}{===========}&gt;$ 人类误差 (开发集分布) </p>
+<p>$\Updownarrow$ 反映可避免偏差</p>
 </li>
 <li><p><strong>训练集误差</strong> (训练集分布)</p>
-<p> <script type="math/tex">\Updownarrow</script> 反映方差情况</p>
+<p> $\Updownarrow$ 反映方差情况</p>
 </li>
 <li><p><strong>训练-开发集误差</strong> (训练集分布)</p>
-<p> <script type="math/tex">\Updownarrow</script> 反映（训练集和开发集）数据不匹配情况</p>
+<p> $\Updownarrow$ 反映（训练集和开发集）数据不匹配情况</p>
 </li>
 <li><p><strong>开发集误差</strong> (开发/测试集分布)</p>
-<p> <script type="math/tex">\Updownarrow</script> 反映算法对开发集的过拟合情况，因为如果这个差距太大，则也许将神经网络</p>
-<p> <script type="math/tex">\Updownarrow</script> 调的太偏向开发集了，此时需要一个更大的开发集</p>
+<p> $\Updownarrow$ 反映算法对开发集的过拟合情况，因为如果这个差距太大，则也许将神经网络</p>
+<p> $\Updownarrow$ 调的太偏向开发集了，此时需要一个更大的开发集</p>
 </li>
 <li><p><strong>测试集误差</strong> (开发/测试集分布)</p>
 </li>
@@ -250,7 +250,7 @@ Y=\begin{bmatrix}
 <p>搭建上图中的网络进行训练，最后一层有四个单元，表示识别的四种物体的概率，那么代价函数可以表示为：</p>
 <script type="math/tex; mode=display">
 J=\frac{1}{m} \sum\limits^{m}_{i=1}\sum\limits^{4}_{j=1}L(\hat y^{(i)}_j,y^{(i)}_j)</script><ul>
-<li><p>有时候 4 个标签会有缺失（下图中的 “？”），你仍然可以进行训练，只需要省略缺失项， <script type="math/tex">\sum\limits^{4}_{j=1}</script> 只对有标签的值进行求和即可</p>
+<li><p>有时候 4 个标签会有缺失（下图中的 “？”），你仍然可以进行训练，只需要省略缺失项， $\sum\limits^{4}_{j=1}$ 只对有标签的值进行求和即可</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_3.2_11.png" alt=""></p>
 </li>
 <li><p>该方法相当于将四个独立的神经网络合在一起，但是效果更好</p>
@@ -274,20 +274,20 @@ J=\frac{1}{m} \sum\limits^{m}_{i=1}\sum\limits^{4}_{j=1}L(\hat y^{(i)}_j,y^{(i)}
 <h3 id="一些例子"><a href="#一些例子" class="headerlink" title="一些例子"></a>一些例子</h3><ul>
 <li><p>例子 1</p>
 <p>加入要建立一个语音识别系统，那么一般思路为：</p>
-<p>输入音频 x <script type="math/tex">\xrightarrow{MFCC算法}</script> 提取低级特征 <script type="math/tex">\xrightarrow{ML算法}</script> 找到音素 <script type="math/tex">\xrightarrow{组合}</script> 单词  <script type="math/tex">\xrightarrow{剪辑}</script> 输出文字 y                    </p>
+<p>输入音频 x $\xrightarrow{MFCC算法}$ 提取低级特征 $\xrightarrow{ML算法}$ 找到音素 $\xrightarrow{组合}$ 单词  $\xrightarrow{剪辑}$ 输出文字 y                    </p>
 <p>而端到端深度学习的实现方式为直接建立输入语音 x 和文字脚本 y 的映射：</p>
-<p>输入音频 x   <script type="math/tex">\xrightarrow{ \quad \quad\quad\quad\quad\quad\quad 端到端深度学习 \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad}</script> 输出文字 y   </p>
+<p>输入音频 x   $\xrightarrow{ \quad \quad\quad\quad\quad\quad\quad 端到端深度学习 \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad}$ 输出文字 y   </p>
 </li>
 <li><p>例子 2</p>
 <p>机器翻译系统，传统机器学习思路：</p>
-<p>英语 <script type="math/tex">\rightarrow</script> 文本分析 <script type="math/tex">\rightarrow</script> 提取特征 <script type="math/tex">\rightarrow</script> … <script type="math/tex">\rightarrow</script> 中文</p>
+<p>英语 $\rightarrow$ 文本分析 $\rightarrow$ 提取特征 $\rightarrow$ … $\rightarrow$ 中文</p>
 <p>端到端机器学习使用大量的英文和中文对应文本的数据集进行直接映射：</p>
-<p>英文<script type="math/tex">\xrightarrow{ \quad \quad\quad\quad\quad 端到端深度学习 \quad\quad\quad}</script> 中文 </p>
+<p>英文$\xrightarrow{ \quad \quad\quad\quad\quad 端到端深度学习 \quad\quad\quad}$ 中文 </p>
 </li>
 </ul>
 <h3 id="end-to-end-DL-的优缺点"><a href="#end-to-end-DL-的优缺点" class="headerlink" title="end-to-end DL 的优缺点"></a>end-to-end DL 的优缺点</h3><ol>
 <li>优点<ul>
-<li>端到端数据学习让数据“说话”，从 X <script type="math/tex">\rightarrow</script> Y 的映射中更好地学习到数据内在的统计学特征，而不是被迫去反映人的先见<ul>
+<li>端到端数据学习让数据“说话”，从 X $\rightarrow$ Y 的映射中更好地学习到数据内在的统计学特征，而不是被迫去反映人的先见<ul>
 <li>例如传统机器学习利用到语言中“音素”的概念，但是这个概念是是一个人造的产物，无法确定让算法使用“音素”是不是有利的</li>
 </ul>
 </li>
@@ -295,7 +295,7 @@ J=\frac{1}{m} \sum\limits^{m}_{i=1}\sum\limits^{4}_{j=1}L(\hat y^{(i)}_j,y^{(i)}
 </ul>
 </li>
 <li>缺点<ul>
-<li>为了得到 X 到 Y 的映射，需要非常大量的 (X <script type="math/tex">\rightarrow</script>Y) 数据</li>
+<li>为了得到 X 到 Y 的映射，需要非常大量的 (X $\rightarrow$Y) 数据</li>
 <li>它排除了一些具有潜在用途的手工设计组件<ul>
 <li>如果数据量不够，那么一个精心手工设计的系统实际上可以向算法中注入人类关于这个问题的知识，是很有帮助的</li>
 </ul>

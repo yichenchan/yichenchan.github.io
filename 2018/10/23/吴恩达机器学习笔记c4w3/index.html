@@ -30,10 +30,10 @@
 </ul>
 <p>我们最后用 softmax 输出四个分类，不仅如此，为了找出它们的位置，还需要输出以下四个值：</p>
 <ul>
-<li><script type="math/tex">b_x</script> ：方框中心的横坐标</li>
-<li><script type="math/tex">b_y</script>：方框中心的纵坐标</li>
-<li><script type="math/tex">b_h</script>：方框的高度</li>
-<li><script type="math/tex">b_w</script>：方框的宽度</li>
+<li>$b_x$ ：方框中心的横坐标</li>
+<li>$b_y$：方框中心的纵坐标</li>
+<li>$b_h$：方框的高度</li>
+<li>$b_w$：方框的宽度</li>
 </ul>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_2.png" alt=""></p>
 <p>最后目标标签为：</p>
@@ -97,10 +97,10 @@ L(\hat y ,y)=\left\{\begin{matrix}
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_20.png" alt=""></p>
 <p>抑制非最大值的具体的做法为（<strong>假设只是检测单一物体</strong>）：</p>
 <ul>
-<li>每个网格的输出为：$\begin{bmatrix}<br>p_c\\<br>b_x\\<br>b_y\\<br>b_h\\<br>b_w\\<br>\end{bmatrix}$ </li>
-<li>丢弃所有低概率网格，例如 <script type="math/tex">p_c \leqslant 0.6</script> （或其他概率）的网格</li>
+<li>每个网格的输出为：$\begin{bmatrix}<br>p_c\ <br>b_x\ <br>b_y\ <br>b_h\ <br>b_w\ <br>\end{bmatrix}$ </li>
+<li>丢弃所有低概率网格，例如 $p_c \leqslant 0.6$ （或其他概率）的网格</li>
 <li>在剩下的网格中<ul>
-<li>挑选出具有最大 <script type="math/tex">p_c</script> 值的网格</li>
+<li>挑选出具有最大 $p_c$ 值的网格</li>
 <li>丢弃那些与刚刚选出的网格的方框的 IoU 值大于 0.5 的网格（如果 IoU 大于某个阈值，这说明这两个方框重合度太高，便认为它们识别的是同一个物体）</li>
 <li>在剩下的网格中重复上述操作</li>
 </ul>
@@ -110,7 +110,7 @@ L(\hat y ,y)=\left\{\begin{matrix}
 <p>实际中的使用方法见下方的“非最大值抑制”。</p>
 <h2 id="锚框法-anchor-boxes"><a href="#锚框法-anchor-boxes" class="headerlink" title="锚框法 anchor boxes"></a>锚框法 anchor boxes</h2><p>目前看过的物件检测算法，有一个问题是每一个网格只能侦测一个物件，如果一个网格想要侦测多个物体，可以使用“锚框法 anchor boxes”。</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_21.png" alt=""></p>
-<p>对于上面这张图，我们发现人和汽车的中心点几乎重叠在一起，在一个格子里，如果输出 <script type="math/tex">y = \left[ \begin{array} { c } { p _ { c } } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { w } } \\ { b _ { w } } \\ { c _ { 1 } } \\ { c _ { 2 } \\ c_3 } \end{array} \right]</script>，那么它无法同时输出两个物体的方框，只能二选一，我们可以在这个网格画出两个锚框（也可能更多）框住这两个物体，如下图所示：</p>
+<p>对于上面这张图，我们发现人和汽车的中心点几乎重叠在一起，在一个格子里，如果输出 $y = \left[ \begin{array} { c } { p _ { c } } \ { b _ { x } } \ { b _ { y } } \ { b _ { w } } \ { b _ { w } } \ { c _ { 1 } } \ { c _ { 2 } \ c_3 } \end{array} \right]$，那么它无法同时输出两个物体的方框，只能二选一，我们可以在这个网格画出两个锚框（也可能更多）框住这两个物体，如下图所示：</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_22.png" alt=""></p>
 <p>然后将输出的标签改为：</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_4.3_23.png" alt=""></p>
@@ -118,7 +118,7 @@ L(\hat y ,y)=\left\{\begin{matrix}
 <p>在使用锚框前：训练图片中的每个物体被分给一个包含了它中心点的格子。输出维度 3×3×8。</p>
 <p>使用锚框后：训练图片中的每个物体被分给（1）包含了它中心点的格子（2）这个格子里据有更高 IoU 的锚框。输出维度为 3×3×2×8。</p>
 <p>举个例子：</p>
-<p> 标签值 <script type="math/tex">y=\left[ \begin{array} { l } { p _ { c } } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { c_ { 1 } } \\ { c _ { 2 } }\\ { c _ { 3 } } \\ { p _ { c } } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { c _ { 1 } } \\ { c _ { 2 } } \\ { c _ { 3 } }  \end{array} \right]</script>，假如某个网格有两个物体，则为 <script type="math/tex">\left[ \begin{array} { l } { 1 } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { 1 } \\ { 0}\\ { 0 } \\ { 1 } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { 0 } \\ { 1 } \\ { 0 }  \end{array} \right]</script>，如果只有车，则为 <script type="math/tex">\left[ \begin{array} { l } { 0 } \\ { ？ } \\ { ？} \\ { ？ } \\ {  ？ } \\ { ？} \\ { ？}\\ { ？ } \\ { 1 } \\ { b _ { x } } \\ { b _ { y } } \\ { b _ { h } } \\ { b _ { w } } \\ { 0 } \\ { 1 } \\ { 0 }  \end{array} \right]</script>  </p>
+<p> 标签值 $y=\left[ \begin{array} { l } { p _ { c } } \ { b _ { x } } \ { b _ { y } } \ { b _ { h } } \ { b _ { w } } \ { c_ { 1 } } \ { c _ { 2 } }\ { c _ { 3 } } \ { p _ { c } } \ { b _ { x } } \ { b _ { y } } \ { b _ { h } } \ { b _ { w } } \ { c _ { 1 } } \ { c _ { 2 } } \ { c _ { 3 } }  \end{array} \right]$，假如某个网格有两个物体，则为 $ \left[ \begin{array} { l } { 1 } \ { b _ { x } } \ { b _ { y } } \ { b _ { h } } \ { b _ { w } } \ { 1 } \ { 0}\ { 0 } \ { 1 } \ { b _ { x } } \ { b _ { y } } \ { b _ { h } } \ { b _ { w } } \ { 0 } \ { 1 } \ { 0 }  \end{array} \right] $，如果只有车，则为 $ \left[ \begin{array} { l } { 0 } \ { ？ } \ { ？} \ { ？ } \ {  ？ } \ { ？} \ { ？}\ { ？ } \ { 1 } \ { b _ { x } } \ { b _ { y } } \ { b _ { h } } \ { b _ { w } } \ { 0 } \ { 1 } \ { 0 }  \end{array} \right] $  </p>
 <p>实际上，在一个网格处理两个物体的情况很少发生，尤其是当网格为 19×19 时。</p>
 <h2 id="YOLO-物体检测算法"><a href="#YOLO-物体检测算法" class="headerlink" title="YOLO 物体检测算法"></a>YOLO 物体检测算法</h2><p>综合上面所有要素，来组成目前最先进的目标检测算法——YOLO 算法。</p>
 <h3 id="构建训练集并训练"><a href="#构建训练集并训练" class="headerlink" title="构建训练集并训练"></a>构建训练集并训练</h3><ul>

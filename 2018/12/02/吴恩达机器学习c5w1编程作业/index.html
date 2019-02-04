@@ -78,18 +78,18 @@ dx^{\langle t \rangle} = W_f^T[:,n_a:] d\Gamma_f^{\langle t \rangle} + W_u^T[:,n
 <h3 id="采样-sampling"><a href="#采样-sampling" class="headerlink" title="采样 sampling"></a>采样 sampling</h3><p>模型训练好之后，如何生成文字呢？如下图所示：</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_code_5.1_8.png" alt=""></p>
 <ul>
-<li><p>先输入一个假的输入 <script type="math/tex">x^{<1>} = 0，a^{<0>} = 0</script></p>
+<li><p>先输入一个假的输入 $x^{<1>} = 0，a^{<0>} = 0$</0></1></p>
 </li>
-<li><p>按照公式计算 <script type="math/tex">\hat y^{<1>}</script> 和 <script type="math/tex">a^{<1>}</script></p>
+<li><p>按照公式计算 $\hat y^{<1>}$ 和 $a^{<1>}$</1></1></p>
 </li>
-<li><p>进行采样：实际上 <script type="math/tex">\hat y^{<1>}</script> 是 <script type="math/tex">x^{<2>}</script> 的预测值，包含了取不同值的概率，我们根据不同的概率进行随机的取值，例如取索引值 3 的概率为 0.16，那么 <script type="math/tex">x^{<2>}</script> 就有 16% 的概率被赋值为 3</p>
+<li><p>进行采样：实际上 $\hat y^{<1>}$ 是 $x^{<2>}$ 的预测值，包含了取不同值的概率，我们根据不同的概率进行随机的取值，例如取索引值 3 的概率为 0.16，那么 $x^{<2>}$ 就有 16% 的概率被赋值为 3</2></2></1></p>
 <ul>
-<li><p>为什么不直接取 <script type="math/tex">\hat y^{<1>}</script> 中概率值最大的赋值给 <script type="math/tex">x^{<2>}</script>？论坛看到一个解释：</p>
+<li><p>为什么不直接取 $\hat y^{<1>}$ 中概率值最大的赋值给 $x^{<2>}$？论坛看到一个解释：</2></1></p>
 <p>Sampling produces variety. Say you have a list of items with probability of occurrence “car” (30%) “airplane” (70%). If you simply choose the argmax of the probability from the list then you always choose airplane which gets boring. If you alternatively “sample” from the list then 70% of the time you get airplane and 30% car. This is really important in longer sentences; if you choose the argmax you end up with the same sentence all the time (exception when multiple words have exactly same probability 50:50), but sampling gives you an interesting mix of sentences from the same list.</p>
 </li>
 </ul>
 </li>
-<li><p>将采样得到的 <script type="math/tex">x^{<n+1>}</script> 索引值进行 one-hot 编码赋值给 x 以输入下一个循环。重复第一步直到 y 输出一个结束符 “\n” </p>
+<li><p>将采样得到的 $x^{<n+1>}$ 索引值进行 one-hot 编码赋值给 x 以输入下一个循环。重复第一步直到 y 输出一个结束符 “\n” </n+1></p>
 </li>
 </ul>
 <p>代码如下：</p>
@@ -119,14 +119,14 @@ dx^{\langle t \rangle} = W_f^T[:,n_a:] d\Gamma_f^{\langle t \rangle} + W_u^T[:,n
 <p>每个训练用的序列样本长度可以是不同的，但是这里为了方便向量化，将所有用以训练的样本统一长度为 30 s.</p>
 <h2 id="建立模型"><a href="#建立模型" class="headerlink" title="建立模型"></a>建立模型</h2><p>首先确定模型的超参数，我们必须先确定隐藏层的单元数。</p>
 <p><img src="https://raw.githubusercontent.com/yichenchan/blogimg/master/img/dl_code_5.1_5.png" alt=""></p>
-<p>看上面这幅图，所谓隐藏层单元数，就是 <script type="math/tex">W[a^{<t-1>},x^{<t>}]</script> 的输出的维度，用 n_a 表示，这里设为 64.</p>
+<p>看上面这幅图，所谓隐藏层单元数，就是 $W[a^{<t-1>},x^{<t>}]$ 的输出的维度，用 n_a 表示，这里设为 64.</t></t-1></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">n_a = <span class="number">64</span></span><br></pre></td></tr></table></figure>
-<p>如果我们建立的序列模型是在测试时也给出所有序列，例如输入一个序列，预测一个标签，那么可以简单地使用 Keras 的内置函数进行模型构建，但是对于生成模型来说，我们每次只能知道序列前一个的值，而不知道整个序列，无法直接全部输入模型进行预测，只能一个时间点生成一次，然后让  <script type="math/tex">x^{\langle t\rangle} = y^{\langle t-1 \rangle}</script> 继续生成下一个，而内置的 LSTM 模型的逻辑是，一次将所有时间的序列值丢进去然后得到一个输出。</p>
+<p>如果我们建立的序列模型是在测试时也给出所有序列，例如输入一个序列，预测一个标签，那么可以简单地使用 Keras 的内置函数进行模型构建，但是对于生成模型来说，我们每次只能知道序列前一个的值，而不知道整个序列，无法直接全部输入模型进行预测，只能一个时间点生成一次，然后让  $x^{\langle t\rangle} = y^{\langle t-1 \rangle}$ 继续生成下一个，而内置的 LSTM 模型的逻辑是，一次将所有时间的序列值丢进去然后得到一个输出。</p>
 <p>所以在下面的函数中使用 for 循环调用 LSTM 层 T_x 次，由于每个时间点的 LSTM 层的参数都是一样的，所以我们定义一个<strong>全局的</strong> 层 对象，每个 for 循环都调用这个对象，实现参数共享。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">reshapor = Reshape((<span class="number">1</span>, <span class="number">78</span>))                        <span class="comment"># Used in Step 2.B of djmodel(), below</span></span><br><span class="line">LSTM_cell = LSTM(n_a, return_state = <span class="keyword">True</span>)<span class="comment"># return_state 返回 c         # Used in Step 2.C</span></span><br><span class="line">densor = Dense(n_values, activation=<span class="string">'softmax'</span>)     <span class="comment"># Used in Step 2.D</span></span><br></pre></td></tr></table></figure>
 <p>建立模型的步骤是：</p>
 <ul>
-<li><p>建立空列表 outputs 储存每个时间点的输出 <script type="math/tex">\hat y</script> </p>
+<li><p>建立空列表 outputs 储存每个时间点的输出 $\hat y$ </p>
 </li>
 <li><p>for t in 1,…, T_x：</p>
 <ul>

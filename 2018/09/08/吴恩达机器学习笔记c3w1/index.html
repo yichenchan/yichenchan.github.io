@@ -73,11 +73,11 @@ F1=\frac{2}{\frac{1}{P}+\frac{1}{R}}</script><p><img src="https://raw.githubuser
 Error=\frac{1}{\sum\limits_iw^{(i)}}\frac{1}{m_{dev}}\sum\limits_{i=1}^{m_{dev}}w^{(i)}I\{y_{predict}^{(i)} \neq y^{(i)} \}\\
 w^{(i)}= \left\{
 \begin{aligned}1 && 如果x^{(i)}不是色情图片\\10 &  & 如果x^{(i)}是色情图片\end{aligned}\right.</script><ul>
-<li><script type="math/tex">m_{dev}</script> 为开发集的个数</li>
-<li><script type="math/tex">y_{predict}^{(i)}</script> 为第 i 个样本的预测值，取值为 1 或 0</li>
-<li><script type="math/tex">I\{y_{predict}^{(i)} \neq y^{(i)} \}</script> 如果括号里为真，则值为 1，即错误数加 1</li>
+<li>$m_{dev}$ 为开发集的个数</li>
+<li>$y_{predict}^{(i)}$ 为第 i 个样本的预测值，取值为 1 或 0</li>
+<li>$I\{y_{predict}^{(i)} \neq y^{(i)} \}$ 如果括号里为真，则值为 1，即错误数加 1</li>
 <li>如果某个图片是色情图片，则权重 w=10， 将会给它产生更大的误差值，也就是说假如一个图片是色情图片，则它相当于十个错误图片，会大大提高错误率</li>
-<li><script type="math/tex">\frac{1}{\sum\limits_iw^{(i)}}</script> 是归一化操作，使得 error 介于 0～1 之间</li>
+<li>$\frac{1}{\sum\limits_iw^{(i)}}$ 是归一化操作，使得 error 介于 0～1 之间</li>
 </ul>
 </li>
 <li><p>实际情况发生了变化而当前的算法无法满足实际需要时</p>
@@ -113,7 +113,7 @@ w^{(i)}= \left\{
 <li>普通人：3%</li>
 <li>普通医生：1%</li>
 <li>有经验的医生：0.7%</li>
-<li>一个有经验的医生团队讨论：0.5% <script type="math/tex">\rightarrow</script> 作为贝叶斯误差的估计值</li>
+<li>一个有经验的医生团队讨论：0.5% $\rightarrow$ 作为贝叶斯误差的估计值</li>
 </ul>
 <p>那么如何定义人类表现呢？搞清楚你的目的：</p>
 <ul>
